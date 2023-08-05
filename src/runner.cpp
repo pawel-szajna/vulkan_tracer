@@ -40,6 +40,7 @@ void ComputeRunner::execute(u32 iterations)
         vulkan.upload(scene);
         vulkan.execute(1e10);
         vulkan.download(reinterpret_cast<u8*>(batchResult.data()));
+        auto timer = Timers::create("Data aggregation");
         for (usize pixel = 0; pixel < batchResult.size(); ++pixel)
         {
             data[pixel] += weight * batchResult[pixel];
