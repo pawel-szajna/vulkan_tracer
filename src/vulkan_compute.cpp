@@ -235,8 +235,7 @@ void VulkanCompute::createCommandBuffer(u32 jobsX, u32 jobsY, u32 jobsZ)
 u64 VulkanCompute::execute(u64 timeout)
 {
     SPDLOG_INFO("Submitting execution to GPU");
-    SPDLOG_DEBUG("Execution time limit is set to {} ms",
-                 static_cast<float>(timeout / 1e3) / 1e3);
+    SPDLOG_DEBUG("Execution time limit is set to {} ms", static_cast<float>(timeout / 1e3) / 1e3);
     TIMER_START;
     vk::SubmitInfo submitInfo{{}, {}, commandBuffer};
     queue.submit(submitInfo, fence);

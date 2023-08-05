@@ -7,8 +7,7 @@ namespace
 {
 void readConfiguration(SceneBuilder& scene, const YAML::Node& config)
 {
-    scene.setResolution(config["Resolution"]["Width"].as<u32>(),
-                        config["Resolution"]["Height"].as<u32>());
+    scene.setResolution(config["Resolution"]["Width"].as<u32>(), config["Resolution"]["Height"].as<u32>());
     scene.setSamplesPerShaderPass(config["SamplesPerShader"].as<u32>());
 }
 
@@ -19,8 +18,7 @@ vec3 readVector(const YAML::Node& source)
 
 void readSphere(SceneBuilder& scene, const YAML::Node& sphere)
 {
-    scene.addSphere(readVector(sphere["Center"]),
-                    sphere["Radius"].as<float>());
+    scene.addSphere(readVector(sphere["Center"]), sphere["Radius"].as<float>());
 }
 
 void readShapes(SceneBuilder& scene, const YAML::Node& shapes)
@@ -34,7 +32,7 @@ void readShapes(SceneBuilder& scene, const YAML::Node& shapes)
         }
     }
 }
-}
+} // namespace
 
 SceneBuilder SceneReader::read(std::string_view filename)
 {

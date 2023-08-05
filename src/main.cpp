@@ -21,7 +21,7 @@ int main()
     {
         auto scene = SceneReader::read("scene.yml");
 
-        auto width = scene.getResolutionWidth();
+        auto width  = scene.getResolutionWidth();
         auto height = scene.getResolutionHeight();
 
         VulkanCompute vc{inputSize, width * height * sizeof(float) * 4, "main.spv", width, height, 1};
