@@ -11,6 +11,7 @@
 
 #include scene
 #include trace
+#include debug
 
 void main()
 {
@@ -30,6 +31,8 @@ void main()
 
     for (uint i = 0; i < samples; ++i)
     {
-        results.pixels[x + inputs.width * y] = inputs.vectors[0]; //+= weight * trace(ray);
+        results.pixels[x + inputs.width * y] += weight * trace(ray);
     }
+
+    debug(x, y);
 }

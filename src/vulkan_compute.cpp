@@ -235,13 +235,15 @@ void VulkanCompute::createCommandBuffer(u32 jobsX, u32 jobsY, u32 jobsZ)
 void VulkanCompute::execute(u64 timeout)
 {
     SPDLOG_INFO("Submitting execution to GPU");
-    SPDLOG_DEBUG("Expecting results in no more than {} ms", timeout / 1e6);
+    SPDLOG_DEBUG("Execution time limit is set to {} ms",
+                 static_cast<float>(timeout / 1e3) / 1e3);
     TIMER_START;
     vk::SubmitInfo submitInfo{{}, {}, commandBuffer};
     queue.submit(submitInfo, fence);
 
     if (device.waitForFences(fence, true, timeout) == vk::Result::eTimeout)
     {
+        SPDLOG_ERROR("Execution timed out");
         throw std::runtime_error("Timeout");
     }
     auto stop = std::chrono::system_clock::now();

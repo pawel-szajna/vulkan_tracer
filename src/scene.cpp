@@ -18,8 +18,8 @@ InputData SceneBuilder::build()
     SPDLOG_INFO("    Vectors: {}/{}", vectorId, vectorsLimit);
     SPDLOG_INFO("    Scalars: {}/{}", scalarId, scalarsLimit);
 
-    InputData result = inputs;
-    inputs           = InputData{};
+    auto result = inputs;
+    inputs      = InputData{};
     return result;
 }
 

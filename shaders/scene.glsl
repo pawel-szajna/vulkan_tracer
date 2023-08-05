@@ -12,15 +12,14 @@ CollisionOpt Scene_hit(Ray ray, float min, float max)
 
         switch (inputs.shapes[i])
         {
-            case ShapeType_Sphere:
-            current = Sphere_hit(
-            inputs.vectors[vectorId].xyz,
-            inputs.scalars[scalarId],
-            ray, min, max);
+        case ShapeType_Sphere:
+            vec3 center = inputs.vectors[vectorId].xyz;
+            float radius = inputs.scalars[scalarId];
+            current = Sphere_hit(vec3(0, 0, -2), radius, ray, min, max);
             vectorId += 1;
             scalarId += 1;
             break;
-            default:
+        default:
             break;
         }
 

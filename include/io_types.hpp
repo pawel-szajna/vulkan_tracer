@@ -14,6 +14,8 @@ struct InputData
     u32 shapesCount;
     u32 shapes[shapesLimit];
 
+    u8 padding[16 - ((5 + shapesLimit) * 4) % 16];
+
     float vectors[vectorsLimit * 4];
     float scalars[scalarsLimit];
 };
