@@ -1,0 +1,15 @@
+Configuration:
+  Resolution:
+    Width: 800
+    Height: 600
+  SamplesPerShader: 1
+Shapes:
+  - Sphere:
+      Center: [0, -100.5, 0]
+      Radius: 100
+  - Sphere:
+      Center: [0, 0, -2]
+      Radius: 0.5
+  - Sphere:
+      Center: [1.5, 0.5, -4]
+      Radius: 0.25

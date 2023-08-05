@@ -21,6 +21,9 @@ public:
 
     void addSphere(vec3 center, float radius);
 
+    [[nodiscard]] u32 getResolutionWidth() const;
+    [[nodiscard]] u32 getResolutionHeight() const;
+
 private:
 
     void addShape(ShapeType shape);

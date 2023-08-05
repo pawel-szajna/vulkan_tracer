@@ -232,7 +232,7 @@ void VulkanCompute::createCommandBuffer(u32 jobsX, u32 jobsY, u32 jobsZ)
     commandBuffer.end();
 }
 
-void VulkanCompute::execute(u64 timeout)
+u64 VulkanCompute::execute(u64 timeout)
 {
     SPDLOG_INFO("Submitting execution to GPU");
     SPDLOG_DEBUG("Execution time limit is set to {} ms",
@@ -246,6 +246,17 @@ void VulkanCompute::execute(u64 timeout)
         SPDLOG_ERROR("Execution timed out");
         throw std::runtime_error("Timeout");
     }
-    auto stop = std::chrono::system_clock::now();
     TIMER_END("Compute shader execution");
+    return (timerEnd - timerStart).count();
+}
+
+void VulkanCompute::download(u8* outputData)
+{
+    SPDLOG_INFO("Downloading data from GPU memory");
+    TIMER_START;
+    auto outputView = static_cast<u8*>(device.mapMemory(outputMemory, 0, outputMemorySize));
+    std::copy(outputView, outputView + outputMemorySize, outputData);
+    SPDLOG_DEBUG("Download finished, unmapping memory");
+    device.unmapMemory(outputMemory);
+    TIMER_END("Data download");
 }

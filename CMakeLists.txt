@@ -9,6 +9,7 @@ set(Vulkan_INCLUDE_DIRS_Extra "${SDK_PATH}/libexec/include")
 set(Vulkan_LIBRARY_DIRS "${SDK_PATH}/lib")
 
 find_package(spdlog REQUIRED)
+find_package(yaml-cpp REQUIRED)
 
 set(GLSL_SOURCES
     shaders/main.glsl)
@@ -38,6 +39,7 @@ add_executable(
         src/helpers.cpp
         src/main.cpp
         src/scene.cpp
+        src/scene_reader.cpp
         src/vulkan_compute.cpp
 )
 
@@ -64,6 +66,7 @@ target_link_libraries(
     vulkan_tracer
     PRIVATE
         spdlog::spdlog
+        yaml-cpp
         MoltenVK
 )
 

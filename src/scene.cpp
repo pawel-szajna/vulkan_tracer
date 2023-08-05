@@ -23,6 +23,16 @@ InputData SceneBuilder::build()
     return result;
 }
 
+u32 SceneBuilder::getResolutionWidth() const
+{
+    return inputs.renderWidth;
+}
+
+u32 SceneBuilder::getResolutionHeight() const
+{
+    return inputs.renderHeight;
+}
+
 void SceneBuilder::setResolution(u32 width, u32 height)
 {
     inputs.renderWidth  = width;

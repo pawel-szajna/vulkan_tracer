@@ -15,7 +15,7 @@ CollisionOpt Scene_hit(Ray ray, float min, float max)
         case ShapeType_Sphere:
             vec3 center = inputs.vectors[vectorId].xyz;
             float radius = inputs.scalars[scalarId];
-            current = Sphere_hit(vec3(0, 0, -2), radius, ray, min, max);
+            current = Sphere_hit(center, radius, ray, min, max);
             vectorId += 1;
             scalarId += 1;
             break;

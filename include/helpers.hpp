@@ -38,20 +38,14 @@ std::ostream& operator<<(std::ostream& os, const Printable<T>& t)
 std::ostream& operator<<(std::ostream& os, const ioVec& v);
 std::ostream& operator<<(std::ostream& os, const InputData& inputs);
 void seedFromClock(InputData& inputs);
-void save(const OutputData& data, std::string_view filename);
-
-#if SPDLOG_ACTIVE_LEVEL == SPDLOG_LEVEL_DEBUG
+void save(const std::vector<float>& data, u32 width, u32 height, std::string_view filename);
 
 #define TIMER_START \
-    auto start = std::chrono::system_clock::now();
+    auto timerStart = std::chrono::system_clock::now();
 
-#define TIMER_END(what) \
-    auto end = std::chrono::system_clock::now(); \
-    SPDLOG_DEBUG("{} took {} ms",                 \
-                 what,                            \
-                 std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() / 1000.0);
-
-#else
-#define TIMER_START (void)0;
-#define TIMER_END (void)0;
-#endif
+#define TIMER_END(what)                                                 \
+    auto timerEnd = std::chrono::system_clock::now();                   \
+    SPDLOG_DEBUG("{} took {} ms",                                       \
+                 what,                                                  \
+                 std::chrono::duration_cast<std::chrono::microseconds>( \
+                    timerEnd - timerStart).count() / 1000.0);

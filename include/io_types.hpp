@@ -21,10 +21,3 @@ struct InputData
 };
 
 constexpr usize inputSize = sizeof(InputData);
-
-struct OutputData
-{
-    float pixels[renderWidth * renderHeight * 4];
-};
-
-constexpr usize outputSize = sizeof(OutputData);

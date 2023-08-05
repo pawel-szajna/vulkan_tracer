@@ -26,21 +26,21 @@ void seedFromClock(InputData& inputs)
             .count();
 }
 
-void save(const OutputData& data, std::string_view filename)
+void save(const std::vector<float>& data, u32 width, u32 height, std::string_view filename)
 {
     SPDLOG_INFO("Saving image to {}", filename);
     TIMER_START;
     std::ofstream picture{filename};
     picture << "P3\n";
-    picture << renderWidth << ' ' << renderHeight << " 255\n";
+    picture << width << ' ' << height << " 255\n";
 
-    for (int y = renderHeight - 1; y >= 0; --y)
+    for (int y = height - 1; y >= 0; --y)
     {
-        for (int x = 0; x < renderWidth; ++x)
+        for (int x = 0; x < width; ++x)
         {
-            int r = static_cast<int>(256 * std::clamp(data.pixels[(x + y * 640) * 4], 0.f, 0.999f));
-            int g = static_cast<int>(256 * std::clamp(data.pixels[(x + y * 640) * 4 + 1], 0.f, 0.999f));
-            int b = static_cast<int>(256 * std::clamp(data.pixels[(x + y * 640) * 4 + 2], 0.f, 0.999f));
+            int r = static_cast<int>(256 * std::clamp(data[(x + y * width) * 4], 0.f, 0.999f));
+            int g = static_cast<int>(256 * std::clamp(data[(x + y * width) * 4 + 1], 0.f, 0.999f));
+            int b = static_cast<int>(256 * std::clamp(data[(x + y * width) * 4 + 2], 0.f, 0.999f));
             picture << r << ' ' << g << ' ' << b << '\n';
         }
     }

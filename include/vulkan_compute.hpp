@@ -2,6 +2,7 @@
 
 #include <vulkan/vulkan.hpp>
 
+#include <algorithm>
 #include <chrono>
 #include <iostream>
 #include <optional>
@@ -23,7 +24,10 @@ public:
                   u32 jobsZ);
     ~VulkanCompute();
 
-    void execute(u64 timeout = 1000000000);
+    /// @return Time it actually took to execute the load
+    u64 execute(u64 timeout = 1000000000);
+
+    void download(u8* outputData);
 
     template<typename T>
     void upload(const T& inputData)
@@ -40,25 +44,6 @@ public:
         SPDLOG_DEBUG("Upload finished, unmapping memory");
         device.unmapMemory(inputMemory);
         TIMER_END("Data upload");
-    }
-
-    template<typename T>
-    T download()
-    {
-        SPDLOG_INFO("Downloading data from GPU memory");
-        if (sizeof(T) != outputMemorySize)
-        {
-            SPDLOG_WARN("Reading {} bytes from {} bytes sized buffer",
-                        sizeof(T), outputMemorySize);
-        }
-        TIMER_START;
-        T data;
-        auto outputView = static_cast<T*>(device.mapMemory(outputMemory, 0, outputMemorySize));
-        data = *outputView;
-        SPDLOG_DEBUG("Download finished, unmapping memory");
-        device.unmapMemory(outputMemory);
-        TIMER_END("Data download");
-        return data;
     }
 
 private:

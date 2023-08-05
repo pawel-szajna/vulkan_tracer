@@ -1,8 +1,7 @@
 #include "basic_types.hpp"
-#include "constants.hpp"
 #include "helpers.hpp"
 #include "io_types.hpp"
-#include "scene.hpp"
+#include "scene_reader.hpp"
 #include "vulkan_compute.hpp"
 
 #include <spdlog/spdlog.h>
@@ -11,9 +10,6 @@
 int main()
 {
     SPDLOG_INFO("GPU Raytracer startup");
-    SPDLOG_INFO("    Render width: {}", renderWidth);
-    SPDLOG_INFO("    Render height: {}", renderHeight);
-
     TIMER_START;
 
     if (SPDLOG_ACTIVE_LEVEL <= SPDLOG_LEVEL_DEBUG)
@@ -23,18 +19,20 @@ int main()
 
     try
     {
-        VulkanCompute vc{inputSize, outputSize, "main.spv", renderWidth, renderHeight, 1};
+        auto scene = SceneReader::read("scene.yml");
 
-        SceneBuilder scene{};
-        scene.setResolution(renderWidth, renderHeight);
-        scene.setSamplesPerShaderPass(samplesPerShaderPass);
-        scene.addSphere(vec3{0.75, 0.5, 1}, 0.55);
+        auto width = scene.getResolutionWidth();
+        auto height = scene.getResolutionHeight();
 
+        VulkanCompute vc{inputSize, width * height * sizeof(float) * 4, "main.spv", width, height, 1};
         vc.upload(scene.build());
-        vc.execute();
 
-        auto data = vc.download<OutputData>();
-        save(data, "output.ppm");
+        u64 limit = 1e9;
+        vc.execute(limit);
+
+        std::vector<float> data(width * height, 0.f);
+        vc.download(reinterpret_cast<u8*>(data.data()));
+        save(data, width, height, "output.ppm");
     }
     catch (const std::exception& e)
     {
