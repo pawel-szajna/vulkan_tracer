@@ -11,7 +11,7 @@ set(Vulkan_LIBRARY_DIRS "${SDK_PATH}/lib")
 find_package(spdlog REQUIRED)
 
 set(GLSL_SOURCES
-    shaders/tracer.glsl)
+    shaders/main.glsl)
 
 file(GLOB GLSL_FILES "${CMAKE_SOURCE_DIR}/shaders")
 

@@ -18,12 +18,13 @@ def preprocess_file(filename):
     if filename in already_included:
         return ""
     data = get_file_contents(filename)
-    output = ""
+    output = "/* {} */\n\n".format(filename)
     for line in data:
         if line.startswith("#include"):
-            output += preprocess_file(line[len("#include"):].strip())
+            output += preprocess_file("{}.glsl".format(line[len("#include"):].strip()))
         else:
             output += line
+    output += "\n"
     return output
 
 
