@@ -31,6 +31,7 @@ add_custom_target(
 add_executable(
     vulkan_tracer
         src/main.cpp
+        src/scene.cpp
         src/vulkan_compute.cpp
 )
 

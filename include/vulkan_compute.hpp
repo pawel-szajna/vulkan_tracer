@@ -5,6 +5,7 @@
 #include <iostream>
 #include <optional>
 #include <string_view>
+#include <spdlog/spdlog.h>
 
 #include "basic_types.hpp"
 
@@ -25,18 +26,31 @@ public:
     template<typename T>
     void upload(const T& inputData)
     {
+        SPDLOG_INFO("Uploading data to GPU memory");
+        if (sizeof(T) != inputMemorySize)
+        {
+            SPDLOG_WARN("Sending {} bytes to {} bytes sized buffer",
+                        sizeof(T), inputMemorySize);
+        }
         auto memoryView = static_cast<T*>(device.mapMemory(inputMemory, 0, inputMemorySize));
         *memoryView = inputData;
-        std::cout << *memoryView << std::endl;
+        SPDLOG_DEBUG("Upload finished, unmappig memory");
         device.unmapMemory(inputMemory);
     }
 
     template<typename T>
     T download()
     {
+        SPDLOG_INFO("Downloading data from GPU memory");
+        if (sizeof(T) != outputMemorySize)
+        {
+            SPDLOG_WARN("Reading {} bytes from {} bytes sized buffer",
+                        sizeof(T), outputMemorySize);
+        }
         T data;
         auto outputView = static_cast<T*>(device.mapMemory(outputMemory, 0, outputMemorySize));
         data = *outputView;
+        SPDLOG_DEBUG("Download finished, unmapping memory");
         device.unmapMemory(outputMemory);
         return data;
     }

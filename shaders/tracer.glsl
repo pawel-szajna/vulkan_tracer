@@ -12,6 +12,9 @@ buffer Input
     uint randomSeed;
     uint samplesPerShader;
 
+    uint width;
+    uint height;
+
     uint shapeCount;
     uint shapes[shapesLimit];
 
@@ -26,9 +29,6 @@ buffer Output
     vec4 pixels[];
 }
 results;
-
-const uint renderWidth = 640;
-const uint renderHeight = 480;
 
 uint randomInt()
 {
@@ -172,11 +172,11 @@ void main()
 
     Ray ray = {
         vec3(0.0, 0.0, 0.0),
-        screenStart + vec3(float(x) / renderWidth, float(y) / renderWidth, 0.0)
+        screenStart + vec3(float(x) / inputs.width, float(y) / inputs.width, 0.0)
     };
 
     for (uint i = 0; i < samples; ++i)
     {
-        results.pixels[x + renderWidth * y] += weight * trace(ray);
+        results.pixels[x + inputs.width * y] += weight * trace(ray);
     }
 }

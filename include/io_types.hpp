@@ -5,10 +5,13 @@
 
 struct InputData
 {
-    u32 randomSeed{};
-    u32 samplesPerShader{1};
+    u32 randomSeed;
+    u32 samplesPerShader;
 
-    u32 shapesCount{};
+    u32 renderWidth;
+    u32 renderHeight;
+
+    u32 shapesCount;
     u32 shapes[shapesLimit];
 
     float vectors[vectorsLimit * 4];
@@ -19,7 +22,7 @@ constexpr usize inputSize = sizeof(InputData);
 
 struct OutputData
 {
-    float pixels[renderWidth * renderHeight];
+    float pixels[renderWidth * renderHeight * 4];
 };
 
 constexpr usize outputSize = sizeof(OutputData);

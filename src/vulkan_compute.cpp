@@ -55,10 +55,11 @@ VulkanCompute::~VulkanCompute()
 void VulkanCompute::createDevice()
 {
     auto devices = instance.enumeratePhysicalDevices();
+    SPDLOG_DEBUG("Available devices:");
     for (const auto& dev : devices)
     {
         auto properties = dev.getProperties();
-        SPDLOG_DEBUG("Available device: {} - {}, API version {}.{}, compute shared memory {} KB",
+        SPDLOG_DEBUG("    {} - {}, API version {}.{}, compute shared memory {} KB",
                      vk::to_string(properties.deviceType),
                      std::string_view(properties.deviceName),
                      VK_VERSION_MAJOR(properties.apiVersion),
@@ -81,6 +82,8 @@ void VulkanCompute::createDevice()
     }
 
     physicalDevice = *deviceIt;
+    SPDLOG_INFO("Using physical device {}",
+                std::string_view(physicalDevice.getProperties().deviceName));
 
     auto queueFamilies = physicalDevice.getQueueFamilyProperties();
     auto queueIt = std::find_if(queueFamilies.begin(),
@@ -252,11 +255,17 @@ void VulkanCompute::createCommandBuffer(u32 jobsX, u32 jobsY, u32 jobsZ)
 
 void VulkanCompute::execute(u64 timeout)
 {
+    SPDLOG_INFO("Submitting execution to GPU");
+    SPDLOG_DEBUG("Expecting results in no more than {} ms", timeout / 1e6);
+    auto start = std::chrono::system_clock::now();
     vk::SubmitInfo submitInfo{{}, {}, commandBuffer};
     queue.submit(submitInfo, fence);
 
     if (device.waitForFences(fence, true, timeout) == vk::Result::eTimeout)
     {
-        throw std::runtime_error("Tiemout");
+        throw std::runtime_error("Timeout");
     }
+    auto stop = std::chrono::system_clock::now();
+    SPDLOG_INFO("Compute shader execution took {} ms",
+                std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count());
 }

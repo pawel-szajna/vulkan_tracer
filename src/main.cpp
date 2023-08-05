@@ -10,6 +10,7 @@
 
 void save(const OutputData& data, std::string_view filename)
 {
+    SPDLOG_INFO("Saving image to {}", filename);
     std::ofstream picture{filename};
     picture << "P3\n";
     picture << renderWidth << ' ' << renderHeight << " 255\n";
@@ -41,10 +42,12 @@ int main()
     {
         VulkanCompute vc{inputSize, outputSize, "tracer.spv", renderWidth, renderHeight, 1};
 
-        RaytracerInputBuilder builder{};
-        builder.addSphere(vec3{ 0, 0, -2 }, 0.5);
+        SceneBuilder scene{};
+        scene.setResolution(renderWidth, renderHeight);
+        scene.setSamplesPerShaderPass(samplesPerShaderPass);
+        scene.addSphere(vec3{ 0, 0, -2 }, 0.5);
 
-        vc.upload(builder.build());
+        vc.upload(scene.build());
         vc.execute();
 
         auto data = vc.download<OutputData>();
