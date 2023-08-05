@@ -1,8 +1,9 @@
 Configuration:
   Resolution:
-    Width: 800
-    Height: 600
-  SamplesPerShader: 1
+    Width: 640
+    Height: 480
+  SamplesPerShader: 50
+  TotalSamples: 500
 Shapes:
   - Sphere:
       Center: [0, -100.5, 0]

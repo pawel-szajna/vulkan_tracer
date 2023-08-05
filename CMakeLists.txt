@@ -39,8 +39,10 @@ add_executable(
     vulkan_tracer
         src/helpers.cpp
         src/main.cpp
+        src/runner.cpp
         src/scene.cpp
         src/scene_reader.cpp
+        src/timers.cpp
         src/vulkan_compute.cpp
 )
 

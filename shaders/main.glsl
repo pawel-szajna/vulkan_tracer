@@ -24,13 +24,15 @@ void main()
 
     vec3 screenStart = vec3(-0.5, -0.375, -1.0);
 
-    Ray ray = {
-        vec3(0.0, 0.0, 0.0),
-        screenStart + vec3(float(x) / inputs.width, float(y) / inputs.width, 0.0)
-    };
-
     for (uint i = 0; i < samples; ++i)
     {
+        Ray ray = {
+            vec3(0.0, 0.0, 0.0),
+            screenStart + vec3(float(x + random()) / inputs.width,
+                               float(y + random()) / inputs.width,
+                               0.0)
+        };
+
         results.pixels[x + inputs.width * y] += weight * trace(ray);
     }
 

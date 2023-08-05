@@ -1,6 +1,10 @@
 #include "helpers.hpp"
 
+#include "timers.hpp"
+
+#include <cmath>
 #include <fstream>
+#include <random>
 #include <spdlog/spdlog.h>
 
 std::ostream& operator<<(std::ostream& os, const ioVec& v)
@@ -19,17 +23,16 @@ std::ostream& operator<<(std::ostream& os, const InputData& inputs)
     return os;
 }
 
-void seedFromClock(InputData& inputs)
+void changeRandomSeed(InputData& inputs)
 {
-    inputs.randomSeed =
-        std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch())
-            .count();
+    static std::mt19937 mt{std::random_device{}()};
+    inputs.randomSeed = mt();
 }
 
 void save(const std::vector<float>& data, u32 width, u32 height, std::string_view filename)
 {
     SPDLOG_INFO("Saving image to {}", filename);
-    TIMER_START;
+    auto timer = Timers::create("File writing");
     std::ofstream picture{filename};
     picture << "P3\n";
     picture << width << ' ' << height << " 255\n";
@@ -38,12 +41,10 @@ void save(const std::vector<float>& data, u32 width, u32 height, std::string_vie
     {
         for (int x = 0; x < width; ++x)
         {
-            int r = static_cast<int>(256 * std::clamp(data[(x + y * width) * 4], 0.f, 0.999f));
-            int g = static_cast<int>(256 * std::clamp(data[(x + y * width) * 4 + 1], 0.f, 0.999f));
-            int b = static_cast<int>(256 * std::clamp(data[(x + y * width) * 4 + 2], 0.f, 0.999f));
+            int r = static_cast<int>(256 * std::clamp(std::sqrt(data[(x + y * width) * 4]), 0.f, 0.999f));
+            int g = static_cast<int>(256 * std::clamp(std::sqrt(data[(x + y * width) * 4 + 1]), 0.f, 0.999f));
+            int b = static_cast<int>(256 * std::clamp(std::sqrt(data[(x + y * width) * 4 + 2]), 0.f, 0.999f));
             picture << r << ' ' << g << ' ' << b << '\n';
         }
     }
-
-    TIMER_END("File writing");
 }

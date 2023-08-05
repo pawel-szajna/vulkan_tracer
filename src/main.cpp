@@ -1,17 +1,17 @@
-#include "basic_types.hpp"
 #include "helpers.hpp"
 #include "io_types.hpp"
+#include "runner.hpp"
 #include "scene_reader.hpp"
+#include "timers.hpp"
 #include "vulkan_compute.hpp"
 
 #include <argparse/argparse.hpp>
 #include <spdlog/spdlog.h>
-#include <string_view>
 
 int main(int argc, char** argv)
 {
     SPDLOG_INFO("GPU Raytracer startup");
-    TIMER_START;
+    Timers timers{};
 
     if (SPDLOG_ACTIVE_LEVEL <= SPDLOG_LEVEL_DEBUG)
     {
@@ -19,8 +19,7 @@ int main(int argc, char** argv)
     }
 
     argparse::ArgumentParser args("vulkan_tracer");
-    args.add_argument("scene")
-        .help("YML file with scene definition");
+    args.add_argument("scene").help("YML file with scene definition");
 
     try
     {
@@ -41,21 +40,16 @@ int main(int argc, char** argv)
         auto height = scene.getResolutionHeight();
 
         VulkanCompute vc{inputSize, width * height * sizeof(float) * 4, "main.spv", width, height, 1};
-        vc.upload(scene.build());
+        ComputeRunner runner{vc, scene.build()};
 
-        u64 limit = 1e9;
-        vc.execute(limit);
+        runner.execute(scene.getTargetIterations());
 
-        std::vector<float> data(width * height, 0.f);
-        vc.download(reinterpret_cast<u8*>(data.data()));
-        save(data, width, height, "output.ppm");
+        save(runner.results(), width, height, "output.ppm");
     }
     catch (const std::exception& e)
     {
         SPDLOG_CRITICAL("Execution failed: {}", e.what());
     }
-
-    TIMER_END("Raytracer execution");
 
     return 0;
 }

@@ -11,6 +11,7 @@
 
 #include "basic_types.hpp"
 #include "helpers.hpp"
+#include "timers.hpp"
 
 class VulkanCompute
 {
@@ -38,12 +39,11 @@ public:
             SPDLOG_WARN("Sending {} bytes to {} bytes sized buffer",
                         sizeof(T), inputMemorySize);
         }
-        TIMER_START;
+        auto timer = Timers::create("Data upload");
         auto memoryView = static_cast<T*>(device.mapMemory(inputMemory, 0, inputMemorySize));
         *memoryView = inputData;
         SPDLOG_DEBUG("Upload finished, unmapping memory");
         device.unmapMemory(inputMemory);
-        TIMER_END("Data upload");
     }
 
 private:
@@ -52,12 +52,12 @@ private:
     void allocateMemory();
     void loadShader(std::string_view filename);
     void createPipeline();
-    void createCommandBuffer(u32 jobsX, u32 jobsY, u32 jobsZ);
 
     usize inputMemorySize;
     usize outputMemorySize;
 
     u32 queueIndex{};
+    u32 jobsX, jobsY, jobsZ;
 
     vk::Instance instance;
     vk::PhysicalDevice physicalDevice;

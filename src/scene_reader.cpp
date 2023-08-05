@@ -9,6 +9,7 @@ void readConfiguration(SceneBuilder& scene, const YAML::Node& config)
 {
     scene.setResolution(config["Resolution"]["Width"].as<u32>(), config["Resolution"]["Height"].as<u32>());
     scene.setSamplesPerShaderPass(config["SamplesPerShader"].as<u32>());
+    scene.setTargetIterations(config["TotalSamples"].as<u32>());
 }
 
 vec3 readVector(const YAML::Node& source)

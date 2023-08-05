@@ -8,7 +8,7 @@
 
 SceneBuilder::SceneBuilder()
 {
-    seedFromClock(inputs);
+    changeRandomSeed(inputs);
 }
 
 InputData SceneBuilder::build()
@@ -39,9 +39,19 @@ void SceneBuilder::setResolution(u32 width, u32 height)
     inputs.renderHeight = height;
 }
 
+u32 SceneBuilder::getTargetIterations() const
+{
+    return targetIterations;
+}
+
 void SceneBuilder::setSamplesPerShaderPass(u32 count)
 {
     inputs.samplesPerShader = count;
+}
+
+void SceneBuilder::setTargetIterations(u32 count)
+{
+    targetIterations = count;
 }
 
 void SceneBuilder::addSphere(vec3 center, float radius)

@@ -1,12 +1,25 @@
 vec4 trace(Ray ray)
 {
-    CollisionOpt c = Scene_hit(ray, 0, 1.0 / 0.0);
-    if (c.valid)
+    vec4 color = vec4(0, 0, 0, 0);
+    float multiplier = 1;
+
+    for (uint i = 0; i < 4; ++i)
     {
-        return vec4(random(), random(), random(), 0);
+        CollisionOpt collision = Scene_hit(ray, 0, 1.0 / 0.0);
+        if (collision.valid)
+        {
+            vec3 target = collision.point + collision.normal + randomUnit();
+            multiplier *= 0.5;
+            ray.origin = collision.point;
+            ray.direction = target - collision.point;
+            continue;
+        }
+
+        vec3 unitDir = normalize(ray.direction);
+        float t = 0.5 * (unitDir.y + 1.0);
+        color = (1.0 - t) * vec4(1, 1, 1, 0) + t * vec4(0.5, 0.7, 1.0, 0);
+        break;
     }
 
-    vec3 unitDir = normalize(ray.direction);
-    float t = 0.5 * (unitDir.y + 1.0);
-    return (1.0 - t) * vec4(1, 1, 1, 0) + t * vec4(0.5, 0.7, 1.0, 0);
+    return multiplier * color;
 }

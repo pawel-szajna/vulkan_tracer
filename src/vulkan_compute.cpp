@@ -9,12 +9,15 @@ VulkanCompute::VulkanCompute(
     usize inputMemorySize, usize outputMemorySize, std::string_view shader, u32 jobsX, u32 jobsY, u32 jobsZ)
     : inputMemorySize{inputMemorySize}
     , outputMemorySize{outputMemorySize}
+    , jobsX{jobsX}
+    , jobsY{jobsY}
+    , jobsZ{jobsZ}
 {
     SPDLOG_INFO("Creating Vulkan compute helper");
     SPDLOG_DEBUG("Requested memory: input buffer {} bytes, output buffer {} bytes", inputMemorySize, outputMemorySize);
     SPDLOG_DEBUG("Shader file: {}", shader);
 
-    TIMER_START;
+    auto timer = Timers::create("Vulkan setup");
 
     vk::InstanceCreateInfo instanceInfo{vk::InstanceCreateFlags{}, {}, {}, {}};
     instance = vk::createInstance(instanceInfo);
@@ -23,14 +26,11 @@ VulkanCompute::VulkanCompute(
     allocateMemory();
     loadShader(shader);
     createPipeline();
-    createCommandBuffer(jobsX, jobsY, jobsZ);
 
     queue = device.getQueue(queueIndex, 0);
     fence = device.createFence(vk::FenceCreateInfo{});
 
     SPDLOG_DEBUG("Vulkan setup finished");
-
-    TIMER_END("Vulkan setup");
 }
 
 VulkanCompute::~VulkanCompute()
@@ -212,17 +212,21 @@ void VulkanCompute::createPipeline()
         vk::WriteDescriptorSet{descriptorSet, 0, 0, 1, vk::DescriptorType::eStorageBuffer, nullptr, &inputBufferInfo},
         vk::WriteDescriptorSet{descriptorSet, 1, 0, 1, vk::DescriptorType::eStorageBuffer, nullptr, &outputBufferInfo}};
     device.updateDescriptorSets(writeDescriptorSets, {});
-}
 
-void VulkanCompute::createCommandBuffer(u32 jobsX, u32 jobsY, u32 jobsZ)
-{
     vk::CommandPoolCreateInfo commandPoolCreateInfo{{}, queueIndex};
     commandPool = device.createCommandPool(commandPoolCreateInfo);
 
     vk::CommandBufferAllocateInfo commandBufferAllocateInfo{commandPool, vk::CommandBufferLevel::ePrimary, 1};
-
     auto commandBuffers = device.allocateCommandBuffers(commandBufferAllocateInfo);
-    commandBuffer       = commandBuffers.front();
+    commandBuffer  = commandBuffers.front();
+}
+
+u64 VulkanCompute::execute(u64 timeout)
+{
+    SPDLOG_INFO("Submitting execution to GPU");
+    SPDLOG_DEBUG("Execution time limit is set to {} ms", static_cast<float>(timeout / 1e3) / 1e3);
+
+    auto timer = Timers::create("Compute shader execution");
 
     vk::CommandBufferBeginInfo commandBufferBeginInfo{vk::CommandBufferUsageFlagBits::eOneTimeSubmit};
     commandBuffer.begin(commandBufferBeginInfo);
@@ -230,13 +234,7 @@ void VulkanCompute::createCommandBuffer(u32 jobsX, u32 jobsY, u32 jobsZ)
     commandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eCompute, pipelineLayout, 0, descriptorSet, {});
     commandBuffer.dispatch(jobsX, jobsY, jobsZ);
     commandBuffer.end();
-}
 
-u64 VulkanCompute::execute(u64 timeout)
-{
-    SPDLOG_INFO("Submitting execution to GPU");
-    SPDLOG_DEBUG("Execution time limit is set to {} ms", static_cast<float>(timeout / 1e3) / 1e3);
-    TIMER_START;
     vk::SubmitInfo submitInfo{{}, {}, commandBuffer};
     queue.submit(submitInfo, fence);
 
@@ -245,17 +243,22 @@ u64 VulkanCompute::execute(u64 timeout)
         SPDLOG_ERROR("Execution timed out");
         throw std::runtime_error("Timeout");
     }
-    TIMER_END("Compute shader execution");
-    return (timerEnd - timerStart).count();
+
+    commandBuffer.reset(vk::CommandBufferResetFlags{});
+    device.resetFences(fence);
+
+    return timer.finish();
+
 }
 
 void VulkanCompute::download(u8* outputData)
 {
     SPDLOG_INFO("Downloading data from GPU memory");
-    TIMER_START;
+    auto timer = Timers::create("Data download");
     auto outputView = static_cast<u8*>(device.mapMemory(outputMemory, 0, outputMemorySize));
     std::copy(outputView, outputView + outputMemorySize, outputData);
-    SPDLOG_DEBUG("Download finished, unmapping memory");
+    SPDLOG_DEBUG("Download finished, cleaning memory");
+    std::fill(outputView, outputView + outputMemorySize, 0);
+    SPDLOG_DEBUG("Finished");
     device.unmapMemory(outputMemory);
-    TIMER_END("Data download");
 }
