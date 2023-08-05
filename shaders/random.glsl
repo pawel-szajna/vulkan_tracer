@@ -1,11 +1,9 @@
 uint randomInt()
 {
-    uint x = inputs.randomSeed;
-    x ^= x << 13;
-    x ^= x >> 17;
-    x ^= x << 5;
-    inputs.randomSeed = x;
-    return x;
+    uint state = inputs.randomSeed;
+    inputs.randomSeed = inputs.randomSeed * 747796405u + 2891336453u;
+    uint word = ((state >> ((state >> 28u) + 4u)) ^ state) * 277803737u;
+    return (word >> 22u) ^ word;
 }
 
 float random()
@@ -30,6 +28,5 @@ vec3 randomUnit()
 
 void initializeRng(uint x, uint y)
 {
-    inputs.randomSeed += randomInt() % (((x * 74567 - 1) * randomInt()) << 16 + ((y + 102761) * randomInt()));
-    inputs.randomSeed *= randomInt() % (((y * 47981 - 1) * randomInt()) << 16 + ((x +  60257) * randomInt()));
+    inputs.randomSeed += x + inputs.width * y;
 }
