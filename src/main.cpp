@@ -4,10 +4,11 @@
 #include "scene_reader.hpp"
 #include "vulkan_compute.hpp"
 
+#include <argparse/argparse.hpp>
 #include <spdlog/spdlog.h>
 #include <string_view>
 
-int main()
+int main(int argc, char** argv)
 {
     SPDLOG_INFO("GPU Raytracer startup");
     TIMER_START;
@@ -17,9 +18,24 @@ int main()
         spdlog::set_level(spdlog::level::debug);
     }
 
+    argparse::ArgumentParser args("vulkan_tracer");
+    args.add_argument("scene")
+        .help("YML file with scene definition");
+
     try
     {
-        auto scene = SceneReader::read("scene.yml");
+        args.parse_args(argc, argv);
+    }
+    catch (const std::runtime_error& e)
+    {
+        std::cerr << e.what() << std::endl;
+        std::cerr << args;
+        return 1;
+    }
+
+    try
+    {
+        auto scene = SceneReader::read(args.get("scene"));
 
         auto width  = scene.getResolutionWidth();
         auto height = scene.getResolutionHeight();

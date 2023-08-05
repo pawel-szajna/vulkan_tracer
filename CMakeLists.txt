@@ -8,6 +8,7 @@ set(Vulkan_INCLUDE_DIRS "${SDK_PATH}/include")
 set(Vulkan_INCLUDE_DIRS_Extra "${SDK_PATH}/libexec/include")
 set(Vulkan_LIBRARY_DIRS "${SDK_PATH}/lib")
 
+find_package(argparse REQUIRED)
 find_package(spdlog REQUIRED)
 find_package(yaml-cpp REQUIRED)
 
@@ -65,6 +66,7 @@ target_link_directories(
 target_link_libraries(
     vulkan_tracer
     PRIVATE
+        argparse::argparse
         spdlog::spdlog
         yaml-cpp
         MoltenVK
