@@ -5,7 +5,7 @@ vec4 trace(Ray ray)
 
     for (uint i = 0; i < inputs.reflectionsLimit; ++i)
     {
-        CollisionOpt collision = Scene_hit(ray, 0, 1.0 / 0.0);
+        CollisionOpt collision = Scene_hit(ray, 0.001, 1.0 / 0.0);
         if (collision.valid)
         {
             vec3 target = collision.point + collision.normal + randomUnit();
