@@ -21,11 +21,11 @@ Dependencies
 Building
 --------
 
-Get all the dependencies, type `cmake -S. -Bbuild -GNinja && cmake --build build`
+Get all the dependencies, type ``cmake -S. -Bbuild -GNinja && cmake --build build``
 and hope for the best!
 
 Usage
 -----
 
-Calling `./vulkan_tracer scene.yml` should produce a file called `output.ppm` with
+Calling ``./vulkan_tracer scene.yml`` should produce a file called ``output.ppm`` with
 the rendered scene.
