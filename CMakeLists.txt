@@ -13,13 +13,17 @@ find_package(spdlog REQUIRED)
 set(GLSL_SOURCES
     shaders/tracer.glsl)
 
+file(GLOB GLSL_FILES "${CMAKE_SOURCE_DIR}/shaders")
+
 foreach(GLSL_SOURCE ${GLSL_SOURCES})
     get_filename_component(FILE_NAME ${GLSL_SOURCE} NAME_WE)
     set(SPIRV_COMPILED "${CMAKE_BINARY_DIR}/${FILE_NAME}.spv")
+    set(PREPROCESSED "${CMAKE_BINARY_DIR}/${FILE_NAME}_preprocessed.glsl")
     add_custom_command(
         OUTPUT "${SPIRV_COMPILED}"
-        COMMAND glslang ARGS -V -S comp -o ${SPIRV_COMPILED} "${CMAKE_SOURCE_DIR}/${GLSL_SOURCE}"
-        DEPENDS ${GLSL_SOURCE})
+        COMMAND python3 ARGS "${CMAKE_SOURCE_DIR}/tool/glsl_preprocessor.py" "${CMAKE_SOURCE_DIR}/${GLSL_SOURCE}" "${PREPROCESSED}"
+        COMMAND glslang ARGS -V -S comp -o ${SPIRV_COMPILED} ${PREPROCESSED}
+        DEPENDS ${GLSL_FILES})
     list(APPEND SHADER_BINARIES ${SPIRV_COMPILED})
 endforeach()
 
