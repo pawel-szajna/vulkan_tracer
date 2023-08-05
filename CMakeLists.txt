@@ -13,7 +13,7 @@ find_package(spdlog REQUIRED)
 set(GLSL_SOURCES
     shaders/main.glsl)
 
-file(GLOB GLSL_FILES "${CMAKE_SOURCE_DIR}/shaders/*.glsl")
+file(GLOB GLSL_FILES CONFIGURE_DEPENDS "${CMAKE_SOURCE_DIR}/shaders/*.glsl")
 message(${GLSL_FILES})
 
 foreach(GLSL_SOURCE ${GLSL_SOURCES})
