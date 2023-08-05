@@ -7,6 +7,7 @@ struct InputData
 {
     u32 randomSeed;
     u32 samplesPerShader;
+    u32 reflectionsLimit;
 
     u32 renderWidth;
     u32 renderHeight;
@@ -14,10 +15,14 @@ struct InputData
     u32 shapesCount;
     u32 shapes[shapesLimit];
 
-    u8 padding[16 - ((5 + shapesLimit) * 4) % 16];
+    u32 materialCount;
+    u32 materials[materialsLimit];
+
+    u8 padding[16 - ((7 + shapesLimit + materialsLimit) * 4) % 16];
 
     float vectors[vectorsLimit * 4];
     float scalars[scalarsLimit];
+    i32 integers[integersLimit];
 };
 
 constexpr usize inputSize = sizeof(InputData);

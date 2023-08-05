@@ -3,7 +3,7 @@ vec4 trace(Ray ray)
     vec4 color = vec4(0, 0, 0, 0);
     float multiplier = 1;
 
-    for (uint i = 0; i < 4; ++i)
+    for (uint i = 0; i < inputs.reflectionsLimit; ++i)
     {
         CollisionOpt collision = Scene_hit(ray, 0, 1.0 / 0.0);
         if (collision.valid)

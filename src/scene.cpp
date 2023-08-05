@@ -54,6 +54,11 @@ void SceneBuilder::setTargetIterations(u32 count)
     targetIterations = count;
 }
 
+void SceneBuilder::setReflectionsLimit(u32 count)
+{
+    inputs.reflectionsLimit = count;
+}
+
 void SceneBuilder::addSphere(vec3 center, float radius)
 {
     addVector(center);

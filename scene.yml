@@ -1,15 +1,16 @@
 Configuration:
   Resolution:
-    Width: 1920
-    Height: 1080
-  SamplesPerShader: 20
-  TotalSamples: 200
+    Width: 640
+    Height: 480
+  SamplesPerShader: 50
+  TotalSamples: 400
+  ReflectionsLimit: 8
 Shapes:
   - Sphere:
-      Center: [0, -100.75, -2.5]
+      Center: [0, -100.5, -2.5]
       Radius: 100
   - Sphere:
-      Center: [0, -0.25, -2.5]
+      Center: [0, 0, -2.5]
       Radius: 0.5
   - Sphere:
       Center: [1.5, 0.5, -4]

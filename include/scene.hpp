@@ -19,6 +19,7 @@ public:
     void setResolution(u32 width, u32 height);
     void setSamplesPerShaderPass(u32 count);
     void setTargetIterations(u32 count);
+    void setReflectionsLimit(u32 count);
 
     void addSphere(vec3 center, float radius);
 
