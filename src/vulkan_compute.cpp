@@ -2,15 +2,11 @@
 
 #include <fstream>
 #include <iostream>
-#include <stdexcept>
 #include <spdlog/spdlog.h>
+#include <stdexcept>
 
-VulkanCompute::VulkanCompute(usize inputMemorySize,
-                             usize outputMemorySize,
-                             std::string_view shader,
-                             u32 jobsX,
-                             u32 jobsY,
-                             u32 jobsZ)
+VulkanCompute::VulkanCompute(
+    usize inputMemorySize, usize outputMemorySize, std::string_view shader, u32 jobsX, u32 jobsY, u32 jobsZ)
     : inputMemorySize{inputMemorySize}
     , outputMemorySize{outputMemorySize}
 {
@@ -82,16 +78,13 @@ void VulkanCompute::createDevice()
     }
 
     physicalDevice = *deviceIt;
-    SPDLOG_INFO("Using physical device {}",
-                std::string_view(physicalDevice.getProperties().deviceName));
+    SPDLOG_INFO("Using physical device {}", std::string_view(physicalDevice.getProperties().deviceName));
 
     auto queueFamilies = physicalDevice.getQueueFamilyProperties();
-    auto queueIt = std::find_if(queueFamilies.begin(),
-                                queueFamilies.end(),
-                                [](const vk::QueueFamilyProperties& q)
-                                {
-                                    return q.queueFlags & vk::QueueFlagBits::eCompute;
-                                });
+    auto queueIt =
+        std::find_if(queueFamilies.begin(),
+                     queueFamilies.end(),
+                     [](const vk::QueueFamilyProperties& q) { return q.queueFlags & vk::QueueFlagBits::eCompute; });
     if (queueIt == queueFamilies.end())
     {
         throw std::runtime_error("No compute units");
@@ -99,42 +92,38 @@ void VulkanCompute::createDevice()
 
     queueIndex = std::distance(queueFamilies.begin(), queueIt);
 
-    auto queuePriorities = {1.0f};
-    auto queueCreateInfo = vk::DeviceQueueCreateInfo{vk::DeviceQueueCreateFlags{}, queueIndex, queuePriorities};
+    auto queuePriorities  = {1.0f};
+    auto queueCreateInfo  = vk::DeviceQueueCreateInfo{vk::DeviceQueueCreateFlags{}, queueIndex, queuePriorities};
     auto deviceCreateInfo = vk::DeviceCreateInfo{vk::DeviceCreateFlags{}, queueCreateInfo};
-    device = physicalDevice.createDevice(deviceCreateInfo);
+    device                = physicalDevice.createDevice(deviceCreateInfo);
 }
 
 void VulkanCompute::allocateMemory()
 {
     SPDLOG_DEBUG("Allocating GPU memory");
 
-    vk::BufferCreateInfo inputBufferCreateInfo{
-            vk::BufferCreateFlags{},
-            inputMemorySize,
-            vk::BufferUsageFlagBits::eStorageBuffer,
-            vk::SharingMode::eExclusive,
-            1,
-            &queueIndex
-    };
+    vk::BufferCreateInfo inputBufferCreateInfo{vk::BufferCreateFlags{},
+                                               inputMemorySize,
+                                               vk::BufferUsageFlagBits::eStorageBuffer,
+                                               vk::SharingMode::eExclusive,
+                                               1,
+                                               &queueIndex};
 
-    vk::BufferCreateInfo outputBufferCreateInfo{
-            vk::BufferCreateFlags{},
-            outputMemorySize,
-            vk::BufferUsageFlagBits::eStorageBuffer,
-            vk::SharingMode::eExclusive,
-            1,
-            &queueIndex
-    };
+    vk::BufferCreateInfo outputBufferCreateInfo{vk::BufferCreateFlags{},
+                                                outputMemorySize,
+                                                vk::BufferUsageFlagBits::eStorageBuffer,
+                                                vk::SharingMode::eExclusive,
+                                                1,
+                                                &queueIndex};
 
-    inputBuffer = device.createBuffer(inputBufferCreateInfo);
+    inputBuffer  = device.createBuffer(inputBufferCreateInfo);
     outputBuffer = device.createBuffer(outputBufferCreateInfo);
 
-    auto inputMemoryReq = device.getBufferMemoryRequirements(inputBuffer);
+    auto inputMemoryReq  = device.getBufferMemoryRequirements(inputBuffer);
     auto outputMemoryReq = device.getBufferMemoryRequirements(outputBuffer);
 
     vk::PhysicalDeviceMemoryProperties memoryProperties = physicalDevice.getMemoryProperties();
-    auto memoryTypeIt = std::find_if(memoryProperties.memoryTypes.begin(),
+    auto memoryTypeIt                                   = std::find_if(memoryProperties.memoryTypes.begin(),
                                      memoryProperties.memoryTypes.end(),
                                      [](const vk::MemoryType& mt)
                                      {
@@ -148,13 +137,13 @@ void VulkanCompute::allocateMemory()
     }
 
     std::uint32_t memoryTypeIndex = std::distance(memoryProperties.memoryTypes.begin(), memoryTypeIt);
-    auto memoryHeapSize = memoryProperties.memoryHeaps[memoryTypeIt->heapIndex].size;
+    auto memoryHeapSize           = memoryProperties.memoryHeaps[memoryTypeIt->heapIndex].size;
 
-    SPDLOG_DEBUG("Video memory heap size: {} MB", memoryHeapSize / 1048576);
+    SPDLOG_DEBUG("Video memory heap size: {} MB", memoryHeapSize / 1'048'576);
 
     vk::MemoryAllocateInfo inAllocateInfo{inputMemoryReq.size, memoryTypeIndex};
     vk::MemoryAllocateInfo outAllocateInfo{outputMemoryReq.size, memoryTypeIndex};
-    inputMemory = device.allocateMemory(inAllocateInfo);
+    inputMemory  = device.allocateMemory(inAllocateInfo);
     outputMemory = device.allocateMemory(outAllocateInfo);
 
     device.bindBufferMemory(inputBuffer, inputMemory, 0);
@@ -175,11 +164,9 @@ void VulkanCompute::loadShader(std::string_view filename)
     shader.seekg(0);
     shader.read(shaderContents.data(), static_cast<std::streamsize>(shaderContents.size()));
 
-    vk::ShaderModuleCreateInfo shaderModuleCreateInfo{
-            vk::ShaderModuleCreateFlags{},
-            shaderContents.size(),
-            reinterpret_cast<u32*>(shaderContents.data())
-    };
+    vk::ShaderModuleCreateInfo shaderModuleCreateInfo{vk::ShaderModuleCreateFlags{},
+                                                      shaderContents.size(),
+                                                      reinterpret_cast<u32*>(shaderContents.data())};
 
     shaderModule = device.createShaderModule(shaderModuleCreateInfo);
 
@@ -189,27 +176,20 @@ void VulkanCompute::loadShader(std::string_view filename)
 void VulkanCompute::createPipeline()
 {
     std::vector binding = {
-            vk::DescriptorSetLayoutBinding{0, vk::DescriptorType::eStorageBuffer, 1, vk::ShaderStageFlagBits::eCompute},
-            vk::DescriptorSetLayoutBinding{1, vk::DescriptorType::eStorageBuffer, 1, vk::ShaderStageFlagBits::eCompute}
-    };
+        vk::DescriptorSetLayoutBinding{0, vk::DescriptorType::eStorageBuffer, 1, vk::ShaderStageFlagBits::eCompute},
+        vk::DescriptorSetLayoutBinding{1, vk::DescriptorType::eStorageBuffer, 1, vk::ShaderStageFlagBits::eCompute}};
     vk::DescriptorSetLayoutCreateInfo descriptorSetInfo{vk::DescriptorSetLayoutCreateFlags{}, binding};
     descriptorSetLayout = device.createDescriptorSetLayout(descriptorSetInfo);
 
     vk::PipelineLayoutCreateInfo pipelineLayoutCreateInfo{vk::PipelineLayoutCreateFlags{}, descriptorSetLayout};
     pipelineLayout = device.createPipelineLayout(pipelineLayoutCreateInfo);
-    pipelineCache = device.createPipelineCache({});
+    pipelineCache  = device.createPipelineCache({});
 
-    vk::PipelineShaderStageCreateInfo shaderStageInfo{
-            vk::PipelineShaderStageCreateFlags{},
-            vk::ShaderStageFlagBits::eCompute,
-            shaderModule,
-            "main"
-    };
-    vk::ComputePipelineCreateInfo computePipelineInfo{
-            vk::PipelineCreateFlags{},
-            shaderStageInfo,
-            pipelineLayout
-    };
+    vk::PipelineShaderStageCreateInfo shaderStageInfo{vk::PipelineShaderStageCreateFlags{},
+                                                      vk::ShaderStageFlagBits::eCompute,
+                                                      shaderModule,
+                                                      "main"};
+    vk::ComputePipelineCreateInfo computePipelineInfo{vk::PipelineCreateFlags{}, shaderStageInfo, pipelineLayout};
 
     computePipeline = device.createComputePipeline(pipelineCache, computePipelineInfo).value;
 
@@ -219,15 +199,14 @@ void VulkanCompute::createPipeline()
 
     vk::DescriptorSetAllocateInfo descriptorSetAllocateInfo{descriptorPool, descriptorSetLayout};
     auto descriptorSets = device.allocateDescriptorSets(descriptorSetAllocateInfo);
-    descriptorSet = descriptorSets.front();
+    descriptorSet       = descriptorSets.front();
 
     vk::DescriptorBufferInfo inputBufferInfo{inputBuffer, 0, inputMemorySize};
     vk::DescriptorBufferInfo outputBufferInfo{outputBuffer, 0, outputMemorySize};
 
     std::vector writeDescriptorSets = {
         vk::WriteDescriptorSet{descriptorSet, 0, 0, 1, vk::DescriptorType::eStorageBuffer, nullptr, &inputBufferInfo},
-        vk::WriteDescriptorSet{descriptorSet, 1, 0, 1, vk::DescriptorType::eStorageBuffer, nullptr, &outputBufferInfo}
-    };
+        vk::WriteDescriptorSet{descriptorSet, 1, 0, 1, vk::DescriptorType::eStorageBuffer, nullptr, &outputBufferInfo}};
     device.updateDescriptorSets(writeDescriptorSets, {});
 }
 
@@ -236,14 +215,10 @@ void VulkanCompute::createCommandBuffer(u32 jobsX, u32 jobsY, u32 jobsZ)
     vk::CommandPoolCreateInfo commandPoolCreateInfo{{}, queueIndex};
     commandPool = device.createCommandPool(commandPoolCreateInfo);
 
-    vk::CommandBufferAllocateInfo commandBufferAllocateInfo{
-            commandPool,
-            vk::CommandBufferLevel::ePrimary,
-            1
-    };
+    vk::CommandBufferAllocateInfo commandBufferAllocateInfo{commandPool, vk::CommandBufferLevel::ePrimary, 1};
 
     auto commandBuffers = device.allocateCommandBuffers(commandBufferAllocateInfo);
-    commandBuffer = commandBuffers.front();
+    commandBuffer       = commandBuffers.front();
 
     vk::CommandBufferBeginInfo commandBufferBeginInfo{vk::CommandBufferUsageFlagBits::eOneTimeSubmit};
     commandBuffer.begin(commandBufferBeginInfo);

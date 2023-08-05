@@ -1,12 +1,12 @@
 #include "basic_types.hpp"
-#include "io_types.hpp"
 #include "constants.hpp"
+#include "io_types.hpp"
 #include "scene.hpp"
 #include "vulkan_compute.hpp"
 
 #include <fstream>
-#include <string_view>
 #include <spdlog/spdlog.h>
+#include <string_view>
 
 void save(const OutputData& data, std::string_view filename)
 {
@@ -45,7 +45,7 @@ int main()
         SceneBuilder scene{};
         scene.setResolution(renderWidth, renderHeight);
         scene.setSamplesPerShaderPass(samplesPerShaderPass);
-        scene.addSphere(vec3{ 0, 0, -2 }, 0.5);
+        scene.addSphere(vec3{0, 0, -2}, 0.5);
 
         vc.upload(scene.build());
         vc.execute();

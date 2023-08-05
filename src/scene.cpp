@@ -1,7 +1,7 @@
 #include "scene.hpp"
 
-#include <stdexcept>
 #include <spdlog/spdlog.h>
+#include <stdexcept>
 
 #include "constants.hpp"
 #include "helpers.hpp"
@@ -19,13 +19,13 @@ InputData SceneBuilder::build()
     SPDLOG_INFO("    Scalars: {}/{}", scalarId, scalarsLimit);
 
     InputData result = inputs;
-    inputs = InputData{};
+    inputs           = InputData{};
     return result;
 }
 
 void SceneBuilder::setResolution(u32 width, u32 height)
 {
-    inputs.renderWidth = width;
+    inputs.renderWidth  = width;
     inputs.renderHeight = height;
 }
 
@@ -58,7 +58,7 @@ void SceneBuilder::addVector(vec3 vector)
         throw std::length_error("Too many vectors");
     }
 
-    inputs.vectors[vectorId * 4] = vector.x;
+    inputs.vectors[vectorId * 4]     = vector.x;
     inputs.vectors[vectorId * 4 + 1] = vector.y;
     inputs.vectors[vectorId * 4 + 2] = vector.z;
 
