@@ -35,24 +35,15 @@ std::ostream& operator<<(std::ostream& os, const Printable<T>& t)
     return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const ioVec& v)
-{
-    return os << '[' << v.x << ',' << v.y << ',' << v.z << ']';
-}
+std::ostream& operator<<(std::ostream& os, const ioVec& v);
+std::ostream& operator<<(std::ostream& os, const InputData& inputs);
+void seedFromClock(InputData& inputs);
 
-std::ostream& operator<<(std::ostream& os, const InputData& inputs)
-{
-    os << "Input data" << std::endl
-       << "    Random seed: " << inputs.randomSeed << std::endl
-       << "    Shapes count: " << inputs.shapesCount << std::endl
-       << "    Shapes: " << Printable<u32>{inputs.shapes, shapesLimit} << std::endl
-       << "    Vectors: " << Printable<float>{inputs.vectors, vectorsLimit, 4} << std::endl
-       << "    Scalars: " << Printable<float>{inputs.scalars, scalarsLimit} << std::endl;
-    return os;
-}
+#define TIMER_START \
+    auto start = std::chrono::system_clock::now();
 
-void seedFromClock(InputData& inputs)
-{
-    inputs.randomSeed = std::chrono::duration_cast<std::chrono::milliseconds>(
-            std::chrono::system_clock::now().time_since_epoch()).count();
-}
+#define TIMER_END(what) \
+    auto end = std::chrono::system_clock::now(); \
+    SPDLOG_INFO("{} took {} ms",                 \
+                what,                            \
+                std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() / 1000.0);

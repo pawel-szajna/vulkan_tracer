@@ -40,7 +40,7 @@ int main()
 
     try
     {
-        VulkanCompute vc{inputSize, outputSize, "tracer.spv", renderWidth, renderHeight, 1};
+        VulkanCompute vc{inputSize, outputSize, "main.spv", renderWidth, renderHeight, 1};
 
         SceneBuilder scene{};
         scene.setResolution(renderWidth, renderHeight);

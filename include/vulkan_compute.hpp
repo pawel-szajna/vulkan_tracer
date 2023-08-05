@@ -2,12 +2,14 @@
 
 #include <vulkan/vulkan.hpp>
 
+#include <chrono>
 #include <iostream>
 #include <optional>
 #include <string_view>
 #include <spdlog/spdlog.h>
 
 #include "basic_types.hpp"
+#include "helpers.hpp"
 
 class VulkanCompute
 {
@@ -32,10 +34,12 @@ public:
             SPDLOG_WARN("Sending {} bytes to {} bytes sized buffer",
                         sizeof(T), inputMemorySize);
         }
+        TIMER_START;
         auto memoryView = static_cast<T*>(device.mapMemory(inputMemory, 0, inputMemorySize));
         *memoryView = inputData;
-        SPDLOG_DEBUG("Upload finished, unmappig memory");
+        SPDLOG_DEBUG("Upload finished, unmapping memory");
         device.unmapMemory(inputMemory);
+        TIMER_END("Data upload");
     }
 
     template<typename T>
@@ -47,11 +51,13 @@ public:
             SPDLOG_WARN("Reading {} bytes from {} bytes sized buffer",
                         sizeof(T), outputMemorySize);
         }
+        TIMER_START;
         T data;
         auto outputView = static_cast<T*>(device.mapMemory(outputMemory, 0, outputMemorySize));
         data = *outputView;
         SPDLOG_DEBUG("Download finished, unmapping memory");
         device.unmapMemory(outputMemory);
+        TIMER_END("Data download");
         return data;
     }
 

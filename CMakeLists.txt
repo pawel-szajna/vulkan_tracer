@@ -13,7 +13,8 @@ find_package(spdlog REQUIRED)
 set(GLSL_SOURCES
     shaders/main.glsl)
 
-file(GLOB GLSL_FILES "${CMAKE_SOURCE_DIR}/shaders")
+file(GLOB GLSL_FILES "${CMAKE_SOURCE_DIR}/shaders/*.glsl")
+message(${GLSL_FILES})
 
 foreach(GLSL_SOURCE ${GLSL_SOURCES})
     get_filename_component(FILE_NAME ${GLSL_SOURCE} NAME_WE)
@@ -34,6 +35,7 @@ add_custom_target(
 
 add_executable(
     vulkan_tracer
+        src/helpers.cpp
         src/main.cpp
         src/scene.cpp
         src/vulkan_compute.cpp

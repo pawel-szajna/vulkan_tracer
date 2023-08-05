@@ -14,6 +14,8 @@ VulkanCompute::VulkanCompute(
     SPDLOG_DEBUG("Requested memory: input buffer {} bytes, output buffer {} bytes", inputMemorySize, outputMemorySize);
     SPDLOG_DEBUG("Shader file: {}", shader);
 
+    TIMER_START;
+
     vk::InstanceCreateInfo instanceInfo{vk::InstanceCreateFlags{}, {}, {}, {}};
     instance = vk::createInstance(instanceInfo);
 
@@ -27,6 +29,8 @@ VulkanCompute::VulkanCompute(
     fence = device.createFence(vk::FenceCreateInfo{});
 
     SPDLOG_DEBUG("Vulkan setup finished");
+
+    TIMER_END("Vulkan setup");
 }
 
 VulkanCompute::~VulkanCompute()
@@ -232,7 +236,7 @@ void VulkanCompute::execute(u64 timeout)
 {
     SPDLOG_INFO("Submitting execution to GPU");
     SPDLOG_DEBUG("Expecting results in no more than {} ms", timeout / 1e6);
-    auto start = std::chrono::system_clock::now();
+    TIMER_START;
     vk::SubmitInfo submitInfo{{}, {}, commandBuffer};
     queue.submit(submitInfo, fence);
 
@@ -241,6 +245,5 @@ void VulkanCompute::execute(u64 timeout)
         throw std::runtime_error("Timeout");
     }
     auto stop = std::chrono::system_clock::now();
-    SPDLOG_INFO("Compute shader execution took {} ms",
-                std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count());
+    TIMER_END("Compute shader execution");
 }
