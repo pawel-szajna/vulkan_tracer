@@ -34,8 +34,8 @@ void ComputeRunner::execute(u32 iterations)
     for (usize i = 0; i < batches; ++i)
     {
         changeRandomSeed(scene);
-        SPDLOG_DEBUG("Starting batch {} of {}, random seed: {}",
-                     i + 1, batches, scene.randomSeed);
+        SPDLOG_INFO("Starting batch {} of {}, random seed: {}",
+                    i + 1, batches, scene.randomSeed);
 
         vulkan.upload(scene);
         vulkan.execute(1e10);
