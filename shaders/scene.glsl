@@ -10,6 +10,8 @@ ReflectionOpt Scene_reflect(Ray ray, CollisionOpt collision)
         return Fog_reflect(ray, collision);
     case MaterialType_Light:
         return InvalidReflection;
+    case MaterialType_Glass:
+        return Glass_reflect(ray, collision);
     default:
         break;
     }

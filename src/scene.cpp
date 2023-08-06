@@ -104,6 +104,12 @@ void SceneBuilder::addMaterialLight(vec3 color, float intensity)
     addMaterial(MaterialType::Light);
 }
 
+void SceneBuilder::addMaterialGlass(float refractiveIndex)
+{
+    addScalar(refractiveIndex);
+    addMaterial(MaterialType::Glass);
+}
+
 void SceneBuilder::addShapeSphere(vec3 center, float radius, i32 material)
 {
     addVector(center);

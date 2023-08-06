@@ -14,6 +14,10 @@ const uint Light_usageVectors = 1;
 const uint Light_usageScalars = 1;
 const uint Light_usageIntegers = 0;
 
+const uint Glass_usageVectors = 0;
+const uint Glass_usageScalars = 1;
+const uint Glass_usageIntegers = 0;
+
 struct DataUsage
 {
     uint vectors;
@@ -57,6 +61,11 @@ DataUsage materialsDataUsage(uint limit)
             results.vectors += Light_usageVectors;
             results.scalars += Light_usageScalars;
             results.integers += Light_usageIntegers;
+            break;
+        case MaterialType_Glass:
+            results.vectors += Glass_usageVectors;
+            results.scalars += Glass_usageScalars;
+            results.integers += Glass_usageIntegers;
             break;
         default:
             break;

@@ -15,7 +15,7 @@
             "glsl": true,
             "type": "size_t",
             "name": "materialsLimit",
-            "value": 8
+            "value": 16
         },
         {
             "kind": "constant",
@@ -90,6 +90,14 @@
             "type": "uint",
             "name": "MaterialType_Light",
             "value": 4
+        },
+        {
+            "kind": "constant",
+            "cpp": false,
+            "glsl": true,
+            "type": "uint",
+            "name": "MaterialType_Glass",
+            "value": 5
         }
     ]
 }

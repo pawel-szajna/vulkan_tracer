@@ -5,6 +5,7 @@
 
 #include utils/random
 #include utils/colors
+#include utils/vector_ops
 
 #include types/ray
 #include types/collision
@@ -13,6 +14,7 @@
 #include shapes/cloud
 
 #include materials/diffuse
+#include materials/glass
 #include materials/light
 #include materials/fog
 #include materials/mirror
@@ -32,7 +34,8 @@ void main()
     uint samples = inputs.samplesPerShader;
     float weight = 1.0 / samples;
 
-    vec3 screenStart = vec3(-0.5, -0.375, -1.0);
+    vec3 screenStart =
+        vec3(-0.5, -0.5 * (float(inputs.renderHeight) / float(inputs.renderWidth)), -1.0);
     DataUsage usage = materialsDataUsage(inputs.materialsCount);
 
     for (uint i = 0; i < samples; ++i)

@@ -29,6 +29,7 @@ private:
     void readMirror(i32 id, const YAML::Node& mirror);
     void readFog(i32 id, const YAML::Node& fog);
     void readLight(i32 id, const YAML::Node& light);
+    void readGlass(i32 id, const YAML::Node& glass);
 
     void readShapes();
     void readShape(const YAML::Node& shape);
@@ -186,6 +187,12 @@ void SceneReaderImpl::readMaterials()
             readLight(id++, material["Light"]);
             continue;
         }
+
+        if (material["Glass"])
+        {
+            readGlass(id++, material["Glass"]);
+            continue;
+        }
     }
 }
 
@@ -212,6 +219,12 @@ void SceneReaderImpl::readLight(i32 id, const YAML::Node& light)
     saveMaterial(id, light);
     scene.addMaterialLight(readVector(light["Color"]),
                            light["Intensity"].as<float>());
+}
+
+void SceneReaderImpl::readGlass(i32 id, const YAML::Node& glass)
+{
+    saveMaterial(id, glass);
+    scene.addMaterialGlass(glass["RefractiveIndex"].as<float>());
 }
 } // namespace
 
