@@ -10,9 +10,11 @@
 #include types/collision
 
 #include shapes/sphere
+#include shapes/cloud
 
 #include materials/diffuse
 #include materials/mirror
+#include materials/fog
 
 #include scene
 #include trace

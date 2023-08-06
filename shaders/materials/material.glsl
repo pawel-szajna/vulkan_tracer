@@ -6,6 +6,10 @@ const uint Mirror_usageVectors = 1;
 const uint Mirror_usageScalars = 0;
 const uint Mirror_usageIntegers = 0;
 
+const uint Fog_usageVectors = 0;
+const uint Fog_usageScalars = 1;
+const uint Fog_usageIntegers = 0;
+
 struct DataUsage
 {
     uint vectors;
@@ -40,6 +44,10 @@ DataUsage materialsDataUsage(uint limit)
             results.scalars += Mirror_usageScalars;
             results.integers += Mirror_usageIntegers;
             break;
+        case MaterialType_Fog:
+            results.vectors += Fog_usageVectors;
+            results.scalars += Fog_usageScalars;
+            results.integers += Fog_usageIntegers;
         default:
             break;
         }

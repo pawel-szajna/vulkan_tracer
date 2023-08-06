@@ -6,6 +6,7 @@ enum class ShapeType : uint32_t
 {
     Invalid,
     Sphere,
+    Cloud,
 };
 
 enum class MaterialType : uint32_t
@@ -13,6 +14,7 @@ enum class MaterialType : uint32_t
     Invalid,
     Diffuse,
     Mirror,
+    Fog,
 };
 
 class SceneBuilder
@@ -30,8 +32,10 @@ public:
 
     void addMaterialDiffuse(vec3 color);
     void addMaterialMirror(vec3 color);
+    void addMaterialFog(float intensity);
 
     void addShapeSphere(vec3 center, float radius, i32 material);
+    void addShapeCloud(vec3 center, float radius, float intensity, i32 material);
 
     [[nodiscard]] u32 getResolutionWidth() const;
     [[nodiscard]] u32 getResolutionHeight() const;

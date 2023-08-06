@@ -26,9 +26,12 @@ private:
     void readMaterials();
     void readDiffuse(i32 id, const YAML::Node& diffuse);
     void readMirror(i32 id, const YAML::Node& mirror);
+    void readFog(i32 id, const YAML::Node& fog);
 
     void readShapes();
+    void readShape(const YAML::Node& shape);
     void readSphere(const YAML::Node& sphere);
+    void readCloud(const YAML::Node& cloud);
 
     i32 readMaterial(const YAML::Node& source);
 
@@ -97,11 +100,22 @@ void SceneReaderImpl::readShapes()
 {
     for (const auto& shape : root["Shapes"])
     {
-        if (shape["Sphere"])
-        {
-            readSphere(shape["Sphere"]);
-            continue;
-        }
+        readShape(shape);
+    }
+}
+
+void SceneReaderImpl::readShape(const YAML::Node& shape)
+{
+    if (shape["Sphere"])
+    {
+        readSphere(shape["Sphere"]);
+        return;
+    }
+
+    if (shape["Cloud"])
+    {
+        readCloud(shape["Cloud"]);
+        return;
     }
 }
 
@@ -110,6 +124,14 @@ void SceneReaderImpl::readSphere(const YAML::Node& sphere)
     scene.addShapeSphere(readVector(sphere["Center"]),
                          sphere["Radius"].as<float>(),
                          readMaterial(sphere["Material"]));
+}
+
+void SceneReaderImpl::readCloud(const YAML::Node& cloud)
+{
+    scene.addShapeCloud(readVector(cloud["Center"]),
+                        cloud["Radius"].as<float>(),
+                        cloud["Density"].as<float>(),
+                        readMaterial(cloud["Material"]));
 }
 
 void SceneReaderImpl::readMaterials()
@@ -130,6 +152,12 @@ void SceneReaderImpl::readMaterials()
             readMirror(id++, material["Mirror"]);
             continue;
         }
+
+        if (material["Fog"])
+        {
+            readFog(id++, material["Fog"]);
+            continue;
+        }
     }
 }
 
@@ -143,6 +171,12 @@ void SceneReaderImpl::readMirror(i32 id, const YAML::Node& mirror)
 {
     materialNames.emplace(mirror["Name"].as<std::string>(), id);
     scene.addMaterialMirror(readVector(mirror["Color"]));
+}
+
+void SceneReaderImpl::readFog(i32 id, const YAML::Node& fog)
+{
+    materialNames.emplace(fog["Name"].as<std::string>(), id);
+    scene.addMaterialFog(fog["Intensity"].as<float>());
 }
 } // namespace
 

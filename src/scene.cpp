@@ -83,12 +83,27 @@ void SceneBuilder::addMaterialMirror(vec3 color)
     addMaterial(MaterialType::Mirror);
 }
 
+void SceneBuilder::addMaterialFog(float intensity)
+{
+    addScalar(intensity);
+    addMaterial(MaterialType::Fog);
+}
+
 void SceneBuilder::addShapeSphere(vec3 center, float radius, i32 material)
 {
     addVector(center);
     addScalar(radius);
     addInteger(material);
     addShape(ShapeType::Sphere);
+}
+
+void SceneBuilder::addShapeCloud(vec3 center, float radius, float intensity, i32 material)
+{
+    addVector(center);
+    addScalar(radius);
+    addScalar(-1.f / intensity);
+    addInteger(material);
+    addShape(ShapeType::Cloud);
 }
 
 void SceneBuilder::addMaterial(MaterialType material)
