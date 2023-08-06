@@ -1,82 +1,53 @@
 #include "scene_reader.hpp"
 
+#include <map>
 #include <spdlog/spdlog.h>
 #include <stdexcept>
 #include <yaml-cpp/yaml.h>
 
 namespace
 {
-void readConfiguration(SceneBuilder& scene, const YAML::Node& config)
-{
-    scene.setResolution(config["Resolution"]["Width"].as<u32>(), config["Resolution"]["Height"].as<u32>());
-    scene.setSamplesPerShaderPass(config["SamplesPerShader"].as<u32>());
-    scene.setTargetIterations(config["TotalSamples"].as<u32>());
-    scene.setReflectionsLimit(config["ReflectionsLimit"].as<u32>());
-}
-
 vec3 readVector(const YAML::Node& source)
 {
     return {source[0].as<float>(), source[1].as<float>(), source[2].as<float>()};
 }
 
-i32 readMaterial(SceneBuilder& scene, const YAML::Node& source)
+class SceneReaderImpl
 {
-    auto materialId = source.as<i32>();
-    if (scene.getMaterialsCount() < materialId + 1)
-    {
-        throw std::out_of_range(fmt::format("Requested material index {} out of range", materialId));
-    }
-    return materialId;
-}
+public:
 
-void readSphere(SceneBuilder& scene, const YAML::Node& sphere)
-{
-    scene.addShapeSphere(readVector(sphere["Center"]),
-                         sphere["Radius"].as<float>(),
-                         readMaterial(scene, sphere["Material"]));
-}
+    explicit SceneReaderImpl(YAML::Node& root);
+    SceneBuilder operator()();
 
-void readShapes(SceneBuilder& scene, const YAML::Node& shapes)
-{
-    for (const auto& shape : shapes)
-    {
-        if (shape["Sphere"])
-        {
-            readSphere(scene, shape["Sphere"]);
-            continue;
-        }
-    }
-}
+private:
 
-void readDiffuse(SceneBuilder& scene, const YAML::Node& diffuse)
-{
-    scene.addMaterialDiffuse(readVector(diffuse["Color"]));
-}
+    void readConfiguration();
 
-void readMaterials(SceneBuilder& scene, const YAML::Node& materials)
-{
-    for (const auto& material : materials)
-    {
-        if (material["Diffuse"])
-        {
-            readDiffuse(scene, material["Diffuse"]);
-            continue;
-        }
-    }
-}
-} // namespace
+    void readMaterials();
+    void readDiffuse(i32 id, const YAML::Node& diffuse);
 
-SceneBuilder SceneReader::read(std::string_view filename)
-{
-    SPDLOG_INFO("Loading scene configuration from {}", filename);
-    auto data = YAML::LoadFile(std::string(filename));
+    void readShapes();
+    void readSphere(const YAML::Node& sphere);
 
+    i32 readMaterial(const YAML::Node& source);
+
+    YAML::Node& root;
     SceneBuilder scene;
+    std::map<std::string, i32> materialNames;
+};
+
+SceneReaderImpl::SceneReaderImpl(YAML::Node& root)
+    : root{root}
+    , scene{}
+{}
+
+SceneBuilder SceneReaderImpl::operator()()
+{
     try
     {
-        readConfiguration(scene, data["Configuration"]);
-        readMaterials(scene, data["Materials"]);
-        readShapes(scene, data["Shapes"]);
+        readConfiguration();
+        readMaterials();
+        readShapes();
     }
     catch (const YAML::Exception& e)
     {
@@ -89,4 +60,82 @@ SceneBuilder SceneReader::read(std::string_view filename)
         throw std::runtime_error("Could not build scene");
     }
     return scene;
+}
+
+void SceneReaderImpl::readConfiguration()
+{
+    auto config = root["Configuration"];
+
+    scene.setResolution(config["Resolution"]["Width"].as<u32>(), config["Resolution"]["Height"].as<u32>());
+    scene.setSamplesPerShaderPass(config["SamplesPerShader"].as<u32>());
+    scene.setTargetIterations(config["TotalSamples"].as<u32>());
+    scene.setReflectionsLimit(config["ReflectionsLimit"].as<u32>());
+}
+
+i32 SceneReaderImpl::readMaterial(const YAML::Node& source)
+{
+    i32 materialId;
+
+    try
+    {
+        materialId = source.as<i32>();
+    }
+    catch(YAML::Exception&)
+    {
+        materialId = materialNames.at(source.as<std::string>());
+    }
+
+    if (scene.getMaterialsCount() < materialId + 1)
+    {
+        throw std::out_of_range(fmt::format("Requested material index {} out of range", materialId));
+    }
+    return materialId;
+}
+
+void SceneReaderImpl::readShapes()
+{
+    for (const auto& shape : root["Shapes"])
+    {
+        if (shape["Sphere"])
+        {
+            readSphere(shape["Sphere"]);
+            continue;
+        }
+    }
+}
+
+void SceneReaderImpl::readSphere(const YAML::Node& sphere)
+{
+    scene.addShapeSphere(readVector(sphere["Center"]),
+                         sphere["Radius"].as<float>(),
+                         readMaterial(sphere["Material"]));
+}
+
+void SceneReaderImpl::readMaterials()
+{
+    int id = 0;
+    auto materials = root["Materials"];
+
+    for (const auto& material : materials)
+    {
+        if (material["Diffuse"])
+        {
+            readDiffuse(id++, material["Diffuse"]);
+            continue;
+        }
+    }
+}
+
+void SceneReaderImpl::readDiffuse(i32 id, const YAML::Node& diffuse)
+{
+    materialNames.emplace(diffuse["Name"].as<std::string>(), id);
+    scene.addMaterialDiffuse(readVector(diffuse["Color"]));
+}
+} // namespace
+
+SceneBuilder SceneReader::read(std::string_view filename)
+{
+    SPDLOG_INFO("Loading scene configuration from {}", filename);
+    auto data = YAML::LoadFile(std::string(filename));
+    return SceneReaderImpl{data}();
 }

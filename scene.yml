@@ -16,12 +16,12 @@ Shapes:
   - Sphere:
       Center: [0, -100.5, -2.5]
       Radius: 100
-      Material: 1
+      Material: Ground
   - Sphere:
       Center: [0, 0, -2.5]
       Radius: 0.5
-      Material: 0
+      Material: Ball
   - Sphere:
       Center: [1.5, 0.5, -4]
       Radius: 0.25
-      Material: 0
+      Material: Ball
