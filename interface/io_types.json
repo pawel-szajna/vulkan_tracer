@@ -25,7 +25,9 @@
 
                 { "type": "vec4", "name": "vectors", "size": "vectorsLimit" },
                 { "type": "float", "name": "scalars", "size": "scalarsLimit" },
-                { "type": "int", "name": "integers", "size": "integersLimit" }
+                { "type": "int", "name": "integers", "size": "integersLimit" },
+
+                { "type": "vec4", "name": "background" }
             ]
         },
         {

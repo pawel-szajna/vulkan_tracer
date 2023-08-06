@@ -31,6 +31,8 @@ public:
     void setTargetIterations(u32 count);
     void setReflectionsLimit(u32 count);
 
+    void setBackground(vec3 color, float intensity);
+
     void addMaterialDiffuse(vec3 color);
     void addMaterialMirror(vec3 color);
     void addMaterialFog(float intensity);

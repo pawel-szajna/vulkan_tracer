@@ -12,17 +12,14 @@ float trace(Ray ray, DataUsage usage)
             intensity *= lighting;
             if (!reflection.valid)
             {
-                break;
+                return intensity;
             }
             ray = reflection.ray;
             intensity *= reflection.intensity;
             continue;
         }
 
-        vec3 unitDir = normalize(ray.direction);
-        float t = 0.5 * (unitDir.y + 1.0);
-        intensity *= (1.0 - t) * 1 + t * 0.5;
-        break;
+        return intensity * inputs.background.w * colorIntensity(ray.wavelength, inputs.background.xyz);
     }
 
     return intensity;

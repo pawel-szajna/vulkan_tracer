@@ -46,6 +46,14 @@ void SceneBuilder::setResolution(u32 width, u32 height)
     inputs.renderHeight = height;
 }
 
+void SceneBuilder::setBackground(vec3 color, float intensity)
+{
+    inputs.background[0] = color.x;
+    inputs.background[1] = color.y;
+    inputs.background[2] = color.z;
+    inputs.background[3] = intensity;
+}
+
 u32 SceneBuilder::getTargetIterations() const
 {
     return targetIterations;

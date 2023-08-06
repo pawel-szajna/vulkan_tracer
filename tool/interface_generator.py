@@ -68,13 +68,15 @@ def gen_buffer(entry):
     for field in entry["fields"]:
         arr = ""
         align = ""
+        count = 1
         if "size" in field:
             count = field["size"]
-            if mode == "cpp" and field["type"] == "vec4":
-                if type(count) == int:
-                    count *= 4
-                else:
-                    count = "{} * 4".format(count)
+        if mode == "cpp" and field["type"] == "vec4":
+            if type(count) == int:
+                count *= 4
+            else:
+                count = "{} * 4".format(count)
+        if type(count) == int and count > 1 or not type(count) == int:
             arr = "[{}]".format(count)
         if mode == "cpp":
             align = "alignas({}) ".format(alignment[field["type"]])

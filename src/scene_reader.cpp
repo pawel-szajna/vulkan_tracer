@@ -22,6 +22,7 @@ public:
 private:
 
     void readConfiguration();
+    void readBackground();
 
     void readMaterials();
     void readDiffuse(i32 id, const YAML::Node& diffuse);
@@ -52,6 +53,7 @@ SceneBuilder SceneReaderImpl::operator()()
     try
     {
         readConfiguration();
+        readBackground();
         readMaterials();
         readShapes();
     }
@@ -76,6 +78,14 @@ void SceneReaderImpl::readConfiguration()
     scene.setSamplesPerShaderPass(config["SamplesPerShader"].as<u32>());
     scene.setTargetIterations(config["TotalSamples"].as<u32>());
     scene.setReflectionsLimit(config["ReflectionsLimit"].as<u32>());
+}
+
+void SceneReaderImpl::readBackground()
+{
+    auto background = root["Background"];
+
+    scene.setBackground(readVector(background["Color"]),
+                        background["Intensity"].as<float>());
 }
 
 i32 SceneReaderImpl::readMaterial(const YAML::Node& source)
