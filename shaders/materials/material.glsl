@@ -2,6 +2,10 @@ const uint Diffuse_usageVectors = 1;
 const uint Diffuse_usageScalars = 0;
 const uint Diffuse_usageIntegers = 0;
 
+const uint Mirror_usageVectors = 1;
+const uint Mirror_usageScalars = 0;
+const uint Mirror_usageIntegers = 0;
+
 struct DataUsage
 {
     uint vectors;
@@ -9,13 +13,14 @@ struct DataUsage
     uint integers;
 };
 
-struct Reflection
+struct ReflectionOpt
 {
+    bool valid;
     Ray ray;
     vec4 color;
 };
 
-const Reflection InvalidReflection = Reflection(InvalidRay, vec4(0, 0, 0, 0));
+const ReflectionOpt InvalidReflection = ReflectionOpt(false, InvalidRay, vec4(0, 0, 0, 0));
 
 DataUsage materialsDataUsage(uint limit)
 {
@@ -27,6 +32,13 @@ DataUsage materialsDataUsage(uint limit)
         {
         case MaterialType_Diffuse:
             results.vectors += Diffuse_usageVectors;
+            results.scalars += Diffuse_usageScalars;
+            results.integers += Diffuse_usageIntegers;
+            break;
+        case MaterialType_Mirror:
+            results.vectors += Mirror_usageVectors;
+            results.scalars += Mirror_usageScalars;
+            results.integers += Mirror_usageIntegers;
             break;
         default:
             break;

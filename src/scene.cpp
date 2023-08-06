@@ -77,6 +77,12 @@ void SceneBuilder::addMaterialDiffuse(vec3 color)
     addMaterial(MaterialType::Diffuse);
 }
 
+void SceneBuilder::addMaterialMirror(vec3 color)
+{
+    addVector(color);
+    addMaterial(MaterialType::Mirror);
+}
+
 void SceneBuilder::addShapeSphere(vec3 center, float radius, i32 material)
 {
     addVector(center);

@@ -1,9 +1,11 @@
-Reflection Scene_reflect(Ray ray, CollisionOpt collision)
+ReflectionOpt Scene_reflect(Ray ray, CollisionOpt collision)
 {
     switch (inputs.materials[collision.material])
     {
     case MaterialType_Diffuse:
         return Diffuse_reflect(ray, collision);
+    case MaterialType_Mirror:
+        return Mirror_reflect(ray, collision);
     default:
         break;
     }

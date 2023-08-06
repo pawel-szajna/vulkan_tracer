@@ -12,6 +12,7 @@ enum class MaterialType : uint32_t
 {
     Invalid,
     Diffuse,
+    Mirror,
 };
 
 class SceneBuilder
@@ -28,6 +29,8 @@ public:
     void setReflectionsLimit(u32 count);
 
     void addMaterialDiffuse(vec3 color);
+    void addMaterialMirror(vec3 color);
+
     void addShapeSphere(vec3 center, float radius, i32 material);
 
     [[nodiscard]] u32 getResolutionWidth() const;

@@ -27,7 +27,7 @@ set(INTERFACE_DIR "${CMAKE_BINARY_DIR}/generated")
 set(GLSL_SOURCES
     shaders/main.glsl)
 
-file(GLOB GLSL_FILES CONFIGURE_DEPENDS "${CMAKE_SOURCE_DIR}/shaders/*.glsl")
+file(GLOB_RECURSE GLSL_FILES CONFIGURE_DEPENDS "${CMAKE_SOURCE_DIR}/shaders/*.glsl")
 foreach(GLSL_SOURCE ${GLSL_SOURCES})
     get_filename_component(FILE_NAME ${GLSL_SOURCE} NAME_WE)
     set(SPIRV_COMPILED "${CMAKE_BINARY_DIR}/${FILE_NAME}.spv")

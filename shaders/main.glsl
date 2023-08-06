@@ -11,6 +11,7 @@
 #include shapes/sphere
 
 #include materials/diffuse
+#include materials/mirror
 
 #include scene
 #include trace

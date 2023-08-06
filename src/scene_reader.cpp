@@ -25,6 +25,7 @@ private:
 
     void readMaterials();
     void readDiffuse(i32 id, const YAML::Node& diffuse);
+    void readMirror(i32 id, const YAML::Node& mirror);
 
     void readShapes();
     void readSphere(const YAML::Node& sphere);
@@ -123,6 +124,12 @@ void SceneReaderImpl::readMaterials()
             readDiffuse(id++, material["Diffuse"]);
             continue;
         }
+
+        if (material["Mirror"])
+        {
+            readMirror(id++, material["Mirror"]);
+            continue;
+        }
     }
 }
 
@@ -130,6 +137,12 @@ void SceneReaderImpl::readDiffuse(i32 id, const YAML::Node& diffuse)
 {
     materialNames.emplace(diffuse["Name"].as<std::string>(), id);
     scene.addMaterialDiffuse(readVector(diffuse["Color"]));
+}
+
+void SceneReaderImpl::readMirror(i32 id, const YAML::Node& mirror)
+{
+    materialNames.emplace(mirror["Name"].as<std::string>(), id);
+    scene.addMaterialMirror(readVector(mirror["Color"]));
 }
 } // namespace
 

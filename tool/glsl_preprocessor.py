@@ -18,6 +18,7 @@ def preprocess_file(filename):
         filename = "{}{}".format(path, filename)
     if filename in already_included:
         return ""
+    already_included.append(filename)
     data = get_file_contents(filename)
     output = "/* {} */\n\n".format(filename)
     linectr = 1

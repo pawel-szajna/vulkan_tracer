@@ -8,7 +8,11 @@ vec4 trace(Ray ray, DataUsage usage)
         CollisionOpt collision = Scene_hit(ray, usage, 0.001, 1.0 / 0.0);
         if (collision.valid)
         {
-            Reflection reflection = Scene_reflect(ray, collision);
+            ReflectionOpt reflection = Scene_reflect(ray, collision);
+            if (!reflection.valid)
+            {
+                break;
+            }
             ray = reflection.ray;
             color *= reflection.color;
             continue;

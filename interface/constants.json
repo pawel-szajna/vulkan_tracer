@@ -58,6 +58,14 @@
             "type": "uint",
             "name": "MaterialType_Diffuse",
             "value": 1
+        },
+        {
+            "kind": "constant",
+            "cpp": false,
+            "glsl": true,
+            "type": "uint",
+            "name": "MaterialType_Mirror",
+            "value": 2
         }
     ]
 }
