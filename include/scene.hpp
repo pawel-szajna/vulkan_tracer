@@ -15,6 +15,7 @@ enum class MaterialType : uint32_t
     Diffuse,
     Mirror,
     Fog,
+    Light,
 };
 
 class SceneBuilder
@@ -33,6 +34,7 @@ public:
     void addMaterialDiffuse(vec3 color);
     void addMaterialMirror(vec3 color);
     void addMaterialFog(float intensity);
+    void addMaterialLight(vec3 color, float intensity);
 
     void addShapeSphere(vec3 center, float radius, i32 material);
     void addShapeCloud(vec3 center, float radius, float intensity, i32 material);

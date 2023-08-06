@@ -27,6 +27,7 @@ private:
     void readDiffuse(i32 id, const YAML::Node& diffuse);
     void readMirror(i32 id, const YAML::Node& mirror);
     void readFog(i32 id, const YAML::Node& fog);
+    void readLight(i32 id, const YAML::Node& light);
 
     void readShapes();
     void readShape(const YAML::Node& shape);
@@ -84,8 +85,13 @@ i32 SceneReaderImpl::readMaterial(const YAML::Node& source)
     {
         materialId = source.as<i32>();
     }
-    catch(YAML::Exception&)
+    catch (const YAML::Exception&)
     {
+        auto name = source.as<std::string>();
+        if (not materialNames.contains(name))
+        {
+            throw std::invalid_argument("Invalid material name specified");
+        }
         materialId = materialNames.at(source.as<std::string>());
     }
 
@@ -158,6 +164,12 @@ void SceneReaderImpl::readMaterials()
             readFog(id++, material["Fog"]);
             continue;
         }
+
+        if (material["Light"])
+        {
+            readLight(id++, material["Light"]);
+            continue;
+        }
     }
 }
 
@@ -177,6 +189,13 @@ void SceneReaderImpl::readFog(i32 id, const YAML::Node& fog)
 {
     materialNames.emplace(fog["Name"].as<std::string>(), id);
     scene.addMaterialFog(fog["Intensity"].as<float>());
+}
+
+void SceneReaderImpl::readLight(i32 id, const YAML::Node& light)
+{
+    materialNames.emplace(light["Name"].as<std::string>(), id);
+    scene.addMaterialLight(readVector(light["Color"]),
+                           light["Intensity"].as<float>());
 }
 } // namespace
 

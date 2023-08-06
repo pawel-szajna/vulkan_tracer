@@ -89,6 +89,13 @@ void SceneBuilder::addMaterialFog(float intensity)
     addMaterial(MaterialType::Fog);
 }
 
+void SceneBuilder::addMaterialLight(vec3 color, float intensity)
+{
+    addVector(color);
+    addScalar(intensity);
+    addMaterial(MaterialType::Light);
+}
+
 void SceneBuilder::addShapeSphere(vec3 center, float radius, i32 material)
 {
     addVector(center);

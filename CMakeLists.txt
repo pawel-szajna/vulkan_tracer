@@ -48,7 +48,9 @@ endforeach()
 
 add_custom_target(
     shaders
-    DEPENDS ${SHADER_BINARIES}
+    DEPENDS
+        ${SHADER_BINARIES}
+        interfaces
 )
 
 file(GLOB INTERFACE_DEFINITIONS CONFIGURE_DEPENDS "${CMAKE_SOURCE_DIR}/interface/*.json")

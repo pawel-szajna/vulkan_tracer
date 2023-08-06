@@ -13,8 +13,9 @@
 #include shapes/cloud
 
 #include materials/diffuse
-#include materials/mirror
+#include materials/light
 #include materials/fog
+#include materials/mirror
 
 #include scene
 #include trace

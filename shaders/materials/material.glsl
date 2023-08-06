@@ -10,6 +10,10 @@ const uint Fog_usageVectors = 0;
 const uint Fog_usageScalars = 1;
 const uint Fog_usageIntegers = 0;
 
+const uint Light_usageVectors = 1;
+const uint Light_usageScalars = 1;
+const uint Light_usageIntegers = 0;
+
 struct DataUsage
 {
     uint vectors;
@@ -48,6 +52,12 @@ DataUsage materialsDataUsage(uint limit)
             results.vectors += Fog_usageVectors;
             results.scalars += Fog_usageScalars;
             results.integers += Fog_usageIntegers;
+            break;
+        case MaterialType_Light:
+            results.vectors += Light_usageVectors;
+            results.scalars += Light_usageScalars;
+            results.integers += Light_usageIntegers;
+            break;
         default:
             break;
         }

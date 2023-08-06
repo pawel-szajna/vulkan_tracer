@@ -8,11 +8,24 @@ ReflectionOpt Scene_reflect(Ray ray, CollisionOpt collision)
         return Mirror_reflect(ray, collision);
     case MaterialType_Fog:
         return Fog_reflect(ray, collision);
+    case MaterialType_Light:
+        return InvalidReflection;
     default:
         break;
     }
 
     return InvalidReflection;
+}
+
+float Scene_shine(float wavelength, int material)
+{
+    switch(inputs.materials[material])
+    {
+    case MaterialType_Light:
+        return Light_shine(wavelength, material);
+    default:
+        return 1.0;
+    }
 }
 
 CollisionOpt Scene_hit(Ray ray, DataUsage usage, float min, float max)

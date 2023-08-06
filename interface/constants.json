@@ -82,6 +82,14 @@
             "type": "uint",
             "name": "MaterialType_Fog",
             "value": 3
+        },
+        {
+            "kind": "constant",
+            "cpp": false,
+            "glsl": true,
+            "type": "uint",
+            "name": "MaterialType_Light",
+            "value": 4
         }
     ]
 }

@@ -8,6 +8,8 @@ float trace(Ray ray, DataUsage usage)
         if (collision.valid)
         {
             ReflectionOpt reflection = Scene_reflect(ray, collision);
+            float lighting = Scene_shine(ray.wavelength, collision.material);
+            intensity *= lighting;
             if (!reflection.valid)
             {
                 break;
