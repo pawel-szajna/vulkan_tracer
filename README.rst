@@ -10,9 +10,10 @@ Dependencies
 * Tools:
     * **C++ compiler (modern)** – obviously
     * **CMake** – for the build process, recommended with Ninja
-    * **glslang** – shader compilation
-    * **Python 3** – shader code preprocessing
+    * **glslc/glslang** – shader compilation
+    * **Python 3** – shader code preprocessing, interface generators
     * **Vulkan SDK** – Vulkan API is used to use compute shaders
+                       (homebrew MoltenVK works on Apple platforms)
 * C++ Libraries:
     * **argparse** – argument parsing
     * **spdlog** – application logging
