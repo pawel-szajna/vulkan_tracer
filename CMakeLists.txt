@@ -1,16 +1,27 @@
+
 cmake_minimum_required(VERSION 3.24)
 project(vulkan_Test)
 
 set(CMAKE_CXX_STANDARD 23)
 
-set(SDK_PATH "/opt/homebrew/Cellar/molten-vk/1.2.4")
-set(Vulkan_INCLUDE_DIRS "${SDK_PATH}/include")
-set(Vulkan_INCLUDE_DIRS_Extra "${SDK_PATH}/libexec/include")
-set(Vulkan_LIBRARY_DIRS "${SDK_PATH}/lib")
+if(APPLE)
+    set(SDK_PATH "/opt/homebrew/Cellar/molten-vk/1.2.4")
+    set(Vulkan_INCLUDE_DIRS "${SDK_PATH}/include")
+    set(Vulkan_INCLUDE_DIRS_Extra "${SDK_PATH}/libexec/include")
+    set(Vulkan_LIBRARY_DIRS "${SDK_PATH}/lib")
+else()
+    find_package(Vulkan REQUIRED)
+endif()
 
 find_package(argparse REQUIRED)
 find_package(spdlog REQUIRED)
 find_package(yaml-cpp REQUIRED)
+
+find_program(PYTHON_INTERPRETER NAMES python3 python REQUIRED)
+find_program(GLSL_COMPILER NAMES glslang glslc REQUIRED)
+message(STATUS "Found GLSL compiler: ${GLSL_COMPILER}")
+
+get_filename_component(GLSL_COMPILER_NAME ${GLSL_COMPILER} NAME_WE)
 
 set(GLSL_SOURCES
     shaders/main.glsl)
@@ -22,10 +33,15 @@ foreach(GLSL_SOURCE ${GLSL_SOURCES})
     get_filename_component(FILE_NAME ${GLSL_SOURCE} NAME_WE)
     set(SPIRV_COMPILED "${CMAKE_BINARY_DIR}/${FILE_NAME}.spv")
     set(PREPROCESSED "${CMAKE_BINARY_DIR}/${FILE_NAME}_preprocessed.glsl")
+    if(${GLSL_COMPILER_NAME} STREQUAL "glslang")
+        set(GLSL_ARGS -V -S comp -o ${SPIRV_COMPILED} ${PREPROCESSED})
+    else()
+        set(GLSL_ARGS -fshader-stage=compute -o ${SPIRV_COMPILED} ${PREPROCESSED})
+    endif()
     add_custom_command(
         OUTPUT "${SPIRV_COMPILED}"
-        COMMAND python3 ARGS "${CMAKE_SOURCE_DIR}/tool/glsl_preprocessor.py" "${CMAKE_SOURCE_DIR}/${GLSL_SOURCE}" "${PREPROCESSED}"
-        COMMAND glslang ARGS -V -S comp -o ${SPIRV_COMPILED} ${PREPROCESSED}
+        COMMAND ${PYTHON_INTERPRETER} ARGS "${CMAKE_SOURCE_DIR}/tool/glsl_preprocessor.py" "${CMAKE_SOURCE_DIR}/${GLSL_SOURCE}" "${PREPROCESSED}"
+        COMMAND ${GLSL_COMPILER} ARGS ${GLSL_ARGS}
         DEPENDS ${GLSL_FILES})
     list(APPEND SHADER_BINARIES ${SPIRV_COMPILED})
 endforeach()
@@ -71,8 +87,21 @@ target_link_libraries(
         argparse::argparse
         spdlog::spdlog
         yaml-cpp
-        MoltenVK
 )
+
+if(APPLE)
+    target_link_libraries(
+        vulkan_tracer
+        PRIVATE
+            MoltenVK
+    )
+else()
+    target_link_libraries(
+        vulkan_tracer
+        PRIVATE
+            Vulkan::Vulkan
+    )
+endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     target_compile_definitions(

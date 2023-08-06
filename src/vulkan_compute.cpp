@@ -157,7 +157,7 @@ void VulkanCompute::allocateMemory()
 void VulkanCompute::loadShader(std::string_view filename)
 {
     std::vector<char> shaderContents{};
-    std::ifstream shader{filename, std::ios::binary | std::ios::ate};
+    std::ifstream shader{std::string(filename), std::ios::binary | std::ios::ate};
 
     if (shader.bad())
     {

@@ -33,7 +33,7 @@ void save(const std::vector<float>& data, u32 width, u32 height, std::string_vie
 {
     SPDLOG_INFO("Saving image to {}", filename);
     auto timer = Timers::create("File writing");
-    std::ofstream picture{filename};
+    std::ofstream picture{std::string(filename)};
     picture << "P3\n";
     picture << width << ' ' << height << " 255\n";
 
