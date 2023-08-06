@@ -35,6 +35,7 @@ private:
     void readCloud(const YAML::Node& cloud);
 
     i32 readMaterial(const YAML::Node& source);
+    void saveMaterial(i32 id, const YAML::Node& node);
 
     YAML::Node& root;
     SceneBuilder scene;
@@ -100,6 +101,11 @@ i32 SceneReaderImpl::readMaterial(const YAML::Node& source)
         throw std::out_of_range(fmt::format("Requested material index {} out of range", materialId));
     }
     return materialId;
+}
+
+void SceneReaderImpl::saveMaterial(i32 id, const YAML::Node& node)
+{
+    materialNames.emplace(node["Name"].as<std::string>(), id);
 }
 
 void SceneReaderImpl::readShapes()
@@ -175,25 +181,25 @@ void SceneReaderImpl::readMaterials()
 
 void SceneReaderImpl::readDiffuse(i32 id, const YAML::Node& diffuse)
 {
-    materialNames.emplace(diffuse["Name"].as<std::string>(), id);
+    saveMaterial(id, diffuse);
     scene.addMaterialDiffuse(readVector(diffuse["Color"]));
 }
 
 void SceneReaderImpl::readMirror(i32 id, const YAML::Node& mirror)
 {
-    materialNames.emplace(mirror["Name"].as<std::string>(), id);
+    saveMaterial(id, mirror);
     scene.addMaterialMirror(readVector(mirror["Color"]));
 }
 
 void SceneReaderImpl::readFog(i32 id, const YAML::Node& fog)
 {
-    materialNames.emplace(fog["Name"].as<std::string>(), id);
+    saveMaterial(id, fog);
     scene.addMaterialFog(fog["Intensity"].as<float>());
 }
 
 void SceneReaderImpl::readLight(i32 id, const YAML::Node& light)
 {
-    materialNames.emplace(light["Name"].as<std::string>(), id);
+    saveMaterial(id, light);
     scene.addMaterialLight(readVector(light["Color"]),
                            light["Intensity"].as<float>());
 }
