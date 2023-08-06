@@ -15,7 +15,7 @@ Timers::Timers()
 
 Timers::~Timers()
 {
-    auto now = std::chrono::system_clock::now();
+    auto now      = std::chrono::system_clock::now();
     auto duration = (now - creation).count();
 
     u64 sum{};
@@ -56,7 +56,7 @@ u64 Timers::stop(TimerInfo& timer)
 
 u64 Timers::finalize(TimerInfo& timer)
 {
-    auto now = std::chrono::system_clock::now();
+    auto now      = std::chrono::system_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(now - timer.start).count();
     SPDLOG_DEBUG("{} took {} ms", timer.name, duration / 1000.0);
     history[timer.name] += duration;
@@ -67,7 +67,8 @@ TimerInfo::TimerInfo(std::string name)
     : name{std::move(name)}
     , start{std::chrono::system_clock::now()}
     , finished{false}
-{}
+{
+}
 
 TimerInfo::~TimerInfo()
 {

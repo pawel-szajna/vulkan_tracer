@@ -218,7 +218,7 @@ void VulkanCompute::createPipeline()
 
     vk::CommandBufferAllocateInfo commandBufferAllocateInfo{commandPool, vk::CommandBufferLevel::ePrimary, 1};
     auto commandBuffers = device.allocateCommandBuffers(commandBufferAllocateInfo);
-    commandBuffer  = commandBuffers.front();
+    commandBuffer       = commandBuffers.front();
 }
 
 u64 VulkanCompute::execute(u64 timeout)
@@ -248,13 +248,12 @@ u64 VulkanCompute::execute(u64 timeout)
     device.resetFences(fence);
 
     return timer.finish();
-
 }
 
 void VulkanCompute::download(u8* outputData)
 {
     SPDLOG_INFO("Downloading data from GPU memory");
-    auto timer = Timers::create("Data download");
+    auto timer      = Timers::create("Data download");
     auto outputView = static_cast<u8*>(device.mapMemory(outputMemory, 0, outputMemorySize));
     std::copy(outputView, outputView + outputMemorySize, outputData);
     SPDLOG_DEBUG("Download finished, cleaning memory");
