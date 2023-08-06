@@ -50,6 +50,4 @@ void main()
                                               colorSpaceY(ray.wavelength),
                                               colorSpaceZ(ray.wavelength), 0);
     }
-
-    debug(x, y);
 }
