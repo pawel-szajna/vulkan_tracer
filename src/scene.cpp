@@ -13,7 +13,10 @@ SceneBuilder::SceneBuilder()
 
 InputData SceneBuilder::build()
 {
+    auto consumption = inputs.shapesCount + inputs.materialsCount + (vectorId * 4) + scalarId + integerId;
+
     SPDLOG_INFO("Scene built");
+    SPDLOG_INFO("    Memory: {}/{} bytes", 4 * consumption, sizeof(inputs));
     SPDLOG_INFO("    Structures usage:");
     SPDLOG_INFO("        Shapes: {}/{}", inputs.shapesCount, shapesLimit);
     SPDLOG_INFO("        Materials: {}/{}", inputs.materialsCount, materialsLimit);

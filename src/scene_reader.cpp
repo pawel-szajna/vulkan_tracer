@@ -1,15 +1,14 @@
 #include "scene_reader.hpp"
 
-#include <stdexcept>
 #include <spdlog/spdlog.h>
+#include <stdexcept>
 #include <yaml-cpp/yaml.h>
 
 namespace
 {
 void readConfiguration(SceneBuilder& scene, const YAML::Node& config)
 {
-    scene.setResolution(config["Resolution"]["Width"].as<u32>(),
-                        config["Resolution"]["Height"].as<u32>());
+    scene.setResolution(config["Resolution"]["Width"].as<u32>(), config["Resolution"]["Height"].as<u32>());
     scene.setSamplesPerShaderPass(config["SamplesPerShader"].as<u32>());
     scene.setTargetIterations(config["TotalSamples"].as<u32>());
     scene.setReflectionsLimit(config["ReflectionsLimit"].as<u32>());
@@ -25,8 +24,7 @@ i32 readMaterial(SceneBuilder& scene, const YAML::Node& source)
     auto materialId = source.as<i32>();
     if (scene.getMaterialsCount() < materialId + 1)
     {
-        throw std::out_of_range(
-                fmt::format("Requested material index {} out of range", materialId));
+        throw std::out_of_range(fmt::format("Requested material index {} out of range", materialId));
     }
     return materialId;
 }

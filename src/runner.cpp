@@ -21,10 +21,13 @@ void ComputeRunner::execute(u32 iterations)
 
     auto batches = iterations / scene.samplesPerShader;
 
-    SPDLOG_INFO("Execution planned in {} batches of {} samples per batch, yielding {} iterations",
+    SPDLOG_INFO("Execution planned in {} batches of {} samples per batch, yielding {} iterations; "
+                "{}M virtual photons per batch, yielding {}M total photons",
                 batches,
                 scene.samplesPerShader,
-                iterations);
+                iterations,
+                (u64)scene.samplesPerShader * scene.renderWidth * scene.renderHeight / 1'000'000,
+                (u64)scene.samplesPerShader * scene.renderWidth * scene.renderHeight * batches / 1'000'000);
 
     std::vector<float> batchResult{};
     batchResult.resize(scene.renderWidth * scene.renderHeight * 4);
