@@ -13,5 +13,7 @@ ReflectionOpt Mirror_reflect(Ray ray, CollisionOpt collision)
         return InvalidReflection;
     }
     DataUsage usage = materialsDataUsage(collision.material);
-    return ReflectionOpt(true, Ray(collision.point, reflected), inputs.vectors[usage.vectors]);
+    return ReflectionOpt(true,
+                         Ray(collision.point, reflected, ray.wavelength),
+                         colorIntensity(ray.wavelength, inputs.vectors[usage.vectors].xyz));
 }

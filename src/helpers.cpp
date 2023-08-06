@@ -7,6 +7,43 @@
 #include <random>
 #include <spdlog/spdlog.h>
 
+namespace
+{
+unsigned exportColor(float color)
+{
+    return static_cast<unsigned>(256 * std::clamp(std::sqrt(color), 0.f, 0.999f));
+}
+
+std::tuple<float, float, float> xyzToRgb(float x, float y, float z)
+{
+    constexpr static float n = 3400850.0;
+
+    constexpr static float a11 = 8041697.0 / n;
+    constexpr static float a12 = -3049000.0 / n;
+    constexpr static float a13 = -1591847.0 / n;
+    constexpr static float a21 = -1752003.0 / n;
+    constexpr static float a22 = 4851000.0 / n;
+    constexpr static float a23 = 301853.0 / n;
+    constexpr static float a31 = 17697.0 / n;
+    constexpr static float a32 = -49000.0 / n;
+    constexpr static float a33 = 3432153.0 / n;
+
+    auto R = (a11 * x + a12 * y + a13 * z);
+    auto G = (a21 * x + a22 * y + a23 * z);
+    auto B = (a31 * x + a32 * y + a33 * z);
+
+    auto overflowR = std::max(R - 1.f, 0.f);
+    auto overflowG = std::max(G - 1.f, 0.f);
+    auto overflowB = std::max(B - 1.f, 0.f);
+
+    R += overflowG + overflowB;
+    G += overflowR + overflowB;
+    B += overflowR + overflowG;
+
+    return {R, G, B};
+}
+}
+
 std::ostream& operator<<(std::ostream& os, const ioVec& v)
 {
     return os << '[' << v.x << ',' << v.y << ',' << v.z << ']';
@@ -41,10 +78,12 @@ void save(const std::vector<float>& data, u32 width, u32 height, std::string_vie
     {
         for (int x = 0; x < width; ++x)
         {
-            int r = static_cast<int>(256 * std::clamp(std::sqrt(data[(x + y * width) * 4]), 0.f, 0.999f));
-            int g = static_cast<int>(256 * std::clamp(std::sqrt(data[(x + y * width) * 4 + 1]), 0.f, 0.999f));
-            int b = static_cast<int>(256 * std::clamp(std::sqrt(data[(x + y * width) * 4 + 2]), 0.f, 0.999f));
-            picture << r << ' ' << g << ' ' << b << '\n';
+            auto [r, g, b] = xyzToRgb(data[(x + y * width) * 4],
+                                      data[(x + y * width) * 4 + 1],
+                                      data[(x + y * width) * 4 + 2]);
+            picture << exportColor(r) << ' '
+                    << exportColor(g) << ' '
+                    << exportColor(b) << '\n';
         }
     }
 }

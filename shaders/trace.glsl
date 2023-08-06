@@ -1,7 +1,6 @@
-vec4 trace(Ray ray, DataUsage usage)
+float trace(Ray ray, DataUsage usage)
 {
-    vec4 color = vec4(1, 1, 1, 0);
-    float multiplier = 1.0;
+    float intensity = 1.0;
 
     for (uint i = 0; i < inputs.reflectionsLimit; ++i)
     {
@@ -14,15 +13,15 @@ vec4 trace(Ray ray, DataUsage usage)
                 break;
             }
             ray = reflection.ray;
-            color *= reflection.color;
+            intensity *= reflection.intensity;
             continue;
         }
 
         vec3 unitDir = normalize(ray.direction);
         float t = 0.5 * (unitDir.y + 1.0);
-        color *= (1.0 - t) * vec4(1, 1, 1, 0) + t * vec4(0.5, 0.7, 1.0, 0);
+        intensity *= (1.0 - t) * 1 + t * 0.5;
         break;
     }
 
-    return multiplier * color;
+    return intensity;
 }

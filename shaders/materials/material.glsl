@@ -17,10 +17,10 @@ struct ReflectionOpt
 {
     bool valid;
     Ray ray;
-    vec4 color;
+    float intensity;
 };
 
-const ReflectionOpt InvalidReflection = ReflectionOpt(false, InvalidRay, vec4(0, 0, 0, 0));
+const ReflectionOpt InvalidReflection = ReflectionOpt(false, InvalidRay, 0);
 
 DataUsage materialsDataUsage(uint limit)
 {
