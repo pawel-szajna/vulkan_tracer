@@ -7,12 +7,16 @@ Configuration:
   ReflectionsLimit: 16
 Materials:
   - Diffuse:
-      Color: [1, 1, 1]
+      Name: Ball
+      Color: [0.75, 0.35, 0.55]
+  - Diffuse:
+      Name: Ground
+      Color: [0.15, 0.25, 0.05]
 Shapes:
   - Sphere:
       Center: [0, -100.5, -2.5]
       Radius: 100
-      Material: 0
+      Material: 1
   - Sphere:
       Center: [0, 0, -2.5]
       Radius: 0.5

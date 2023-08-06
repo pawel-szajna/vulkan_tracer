@@ -3,17 +3,19 @@
 #include generated constants
 #include generated io_types
 
-#include random
+#include utils/random
 
-#include ray
-#include collision
-#include material
+#include types/ray
+#include types/collision
 
-#include sphere
+#include shapes/sphere
+
+#include materials/diffuse
 
 #include scene
 #include trace
-#include debug
+
+#include utils/debug
 
 void main()
 {
