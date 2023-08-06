@@ -26,6 +26,18 @@ vec3 randomUnit()
     return normalize(randomVector(-1, 1));
 }
 
+vec3 randomInSphere()
+{
+    while (true)
+    {
+        vec3 vec = vec3(random(-1, 1), random(-1, 1), random(-1, 1));
+        if (vec.x * vec.x + vec.y * vec.y + vec.z * vec.z <= 1)
+        {
+            return normalize(vec);
+        }
+    }
+}
+
 void initializeRng(uint x, uint y)
 {
     inputs.randomSeed += x + inputs.width * y;

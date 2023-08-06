@@ -8,7 +8,7 @@ vec4 trace(Ray ray)
         CollisionOpt collision = Scene_hit(ray, 0.001, 1.0 / 0.0);
         if (collision.valid)
         {
-            vec3 target = collision.point + collision.normal + randomUnit();
+            vec3 target = collision.point + collision.normal + randomInSphere();
             multiplier *= 0.5;
             ray.origin = collision.point;
             ray.direction = target - collision.point;
