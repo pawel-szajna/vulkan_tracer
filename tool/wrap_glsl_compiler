@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+TOOL_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+set -o pipefail
+"$@" | ${TOOL_DIR}/glslc_output_map.py

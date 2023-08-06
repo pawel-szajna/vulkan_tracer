@@ -40,8 +40,9 @@ foreach(GLSL_SOURCE ${GLSL_SOURCES})
     add_custom_command(
         OUTPUT "${SPIRV_COMPILED}"
         COMMAND ${PYTHON_INTERPRETER} ARGS "${CMAKE_SOURCE_DIR}/tool/glsl_preprocessor.py" "${CMAKE_SOURCE_DIR}/${GLSL_SOURCE}" "${PREPROCESSED}" "${INTERFACE_DIR}"
-        COMMAND ${GLSL_COMPILER} ARGS ${GLSL_ARGS}
-        DEPENDS ${GLSL_FILES})
+        COMMAND ${CMAKE_SOURCE_DIR}/tool/wrap_glsl_compiler ARGS ${GLSL_COMPILER} ${GLSL_ARGS}
+        DEPENDS ${GLSL_FILES}
+    )
     list(APPEND SHADER_BINARIES ${SPIRV_COMPILED})
 endforeach()
 

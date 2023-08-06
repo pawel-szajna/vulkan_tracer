@@ -20,6 +20,7 @@ def preprocess_file(filename):
         return ""
     data = get_file_contents(filename)
     output = "/* {} */\n\n".format(filename)
+    linectr = 1
     for line in data:
         if line.startswith("#include"):
             include_value = line[len("#include"):].strip()
@@ -27,7 +28,8 @@ def preprocess_file(filename):
                 include_value = "{}/{}".format(gen_dir, include_value[len("generated"):].strip())
             output += preprocess_file("{}.glsl".format(include_value))
         else:
-            output += line
+            output += "{}    // from: {}:{}\n".format(line.rstrip(), filename, linectr)
+        linectr += 1
     output += "\n"
     return output
 
