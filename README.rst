@@ -30,3 +30,9 @@ Usage
 
 Calling ``./vulkan_tracer scene.yml`` should produce a file called ``output.ppm`` with
 the rendered scene.
+
+Compatibility
+-------------
+
+This has only been tested on Apple M1 (and it worked), and on Intel i5-10310U (and it
+didn't work, but no investigation was performed).
