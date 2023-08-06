@@ -49,6 +49,15 @@
             "type": "uint",
             "name": "ShapeType_Sphere",
             "value": 1
+        },
+
+        {
+            "kind": "constant",
+            "cpp": false,
+            "glsl": true,
+            "type": "uint",
+            "name": "MaterialType_Diffuse",
+            "value": 1
         }
     ]
 }

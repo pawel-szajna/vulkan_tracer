@@ -1,10 +1,11 @@
-CollisionOpt Scene_hit(Ray ray, float min, float max)
+CollisionOpt Scene_hit(Ray ray, DataUsage usage, float min, float max)
 {
     CollisionOpt closest = NoCollision;
 
     uint shapeId = 0;
-    uint vectorId = 0;
-    uint scalarId = 0;
+    uint vectorId = usage.vectors;
+    uint scalarId = usage.scalars;
+    uint integerId = usage.integers;
 
     for (uint i = 0; i < inputs.shapesCount; ++i)
     {
@@ -15,9 +16,11 @@ CollisionOpt Scene_hit(Ray ray, float min, float max)
         case ShapeType_Sphere:
             vec3 center = inputs.vectors[vectorId].xyz;
             float radius = inputs.scalars[scalarId];
-            current = Sphere_hit(center, radius, ray, min, max);
+            int material = inputs.integers[integerId];
+            current = Sphere_hit(center, radius, material, ray, min, max);
             vectorId += 1;
             scalarId += 1;
+            integerId += 1;
             break;
         default:
             break;

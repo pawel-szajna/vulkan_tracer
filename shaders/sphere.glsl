@@ -1,4 +1,5 @@
-CollisionOpt Sphere_hit(vec3 sphereCenter, float sphereRadius, Ray ray, float min, float max)
+CollisionOpt Sphere_hit(vec3 sphereCenter, float sphereRadius, int sphereMaterial,
+                        Ray ray, float min, float max)
 {
     vec3 oc = ray.origin - sphereCenter;
 
@@ -23,5 +24,11 @@ CollisionOpt Sphere_hit(vec3 sphereCenter, float sphereRadius, Ray ray, float mi
         }
     }
     vec3 point = Ray_at(ray, root);
-    return Collision(ray.direction, root, point, (point - sphereCenter) / sphereRadius);
+
+    return Collision(ray.direction,
+                     root,
+                     point,
+                     (point - sphereCenter) / sphereRadius,
+                     sphereMaterial);
+
 }

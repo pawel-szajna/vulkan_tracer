@@ -7,6 +7,7 @@
 
 #include ray
 #include collision
+#include material
 
 #include sphere
 
@@ -24,6 +25,7 @@ void main()
     float weight = 1.0 / samples;
 
     vec3 screenStart = vec3(-0.5, -0.375, -1.0);
+    DataUsage usage = materialsDataUsage(inputs.materialsCount);
 
     for (uint i = 0; i < samples; ++i)
     {
@@ -34,7 +36,7 @@ void main()
                                0.0)
         };
 
-        results.pixels[x + inputs.renderWidth * y] += weight * trace(ray);
+        results.pixels[x + inputs.renderWidth * y] += weight * trace(ray, usage);
     }
 
     debug(x, y);

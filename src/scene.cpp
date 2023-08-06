@@ -14,9 +14,13 @@ SceneBuilder::SceneBuilder()
 InputData SceneBuilder::build()
 {
     SPDLOG_INFO("Scene built");
-    SPDLOG_INFO("    Shapes: {}/{}", inputs.shapesCount, shapesLimit);
-    SPDLOG_INFO("    Vectors: {}/{}", vectorId, vectorsLimit);
-    SPDLOG_INFO("    Scalars: {}/{}", scalarId, scalarsLimit);
+    SPDLOG_INFO("    Structures usage:");
+    SPDLOG_INFO("        Shapes: {}/{}", inputs.shapesCount, shapesLimit);
+    SPDLOG_INFO("        Materials: {}/{}", inputs.materialsCount, materialsLimit);
+    SPDLOG_INFO("    Data usage:");
+    SPDLOG_INFO("        Vectors: {}/{}", vectorId, vectorsLimit);
+    SPDLOG_INFO("        Scalars: {}/{}", scalarId, scalarsLimit);
+    SPDLOG_INFO("        Integers: {}/{}", integerId, integersLimit);
 
     auto result = inputs;
     inputs      = InputData{};
@@ -44,6 +48,11 @@ u32 SceneBuilder::getTargetIterations() const
     return targetIterations;
 }
 
+u32 SceneBuilder::getMaterialsCount() const
+{
+    return inputs.materialsCount;
+}
+
 void SceneBuilder::setSamplesPerShaderPass(u32 count)
 {
     inputs.samplesPerShader = count;
@@ -59,11 +68,33 @@ void SceneBuilder::setReflectionsLimit(u32 count)
     inputs.reflectionsLimit = count;
 }
 
-void SceneBuilder::addSphere(vec3 center, float radius)
+void SceneBuilder::addMaterialDiffuse(vec3 color)
+{
+    addVector(color);
+    addMaterial(MaterialType::Diffuse);
+}
+
+void SceneBuilder::addShapeSphere(vec3 center, float radius, i32 material)
 {
     addVector(center);
     addScalar(radius);
+    addInteger(material);
     addShape(ShapeType::Sphere);
+}
+
+void SceneBuilder::addMaterial(MaterialType material)
+{
+    if (inputs.materialsCount == materialsLimit)
+    {
+        throw std::length_error("Too many materials");
+    }
+
+    if (inputs.shapesCount > 0)
+    {
+        throw std::logic_error("Materials cannot be added once a shape has been defined");
+    }
+
+    inputs.materials[inputs.materialsCount++] = std::to_underlying(material);
 }
 
 void SceneBuilder::addShape(ShapeType shape)
@@ -98,4 +129,14 @@ void SceneBuilder::addScalar(float scalar)
     }
 
     inputs.scalars[scalarId++] = scalar;
+}
+
+void SceneBuilder::addInteger(i32 integer)
+{
+    if (integerId == integersLimit)
+    {
+        throw std::length_error("Too many integers");
+    }
+
+    inputs.integers[integerId++] = integer;
 }

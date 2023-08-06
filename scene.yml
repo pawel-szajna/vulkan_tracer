@@ -2,16 +2,22 @@ Configuration:
   Resolution:
     Width: 640
     Height: 480
-  SamplesPerShader: 50
-  TotalSamples: 400
-  ReflectionsLimit: 8
+  SamplesPerShader: 100
+  TotalSamples: 200
+  ReflectionsLimit: 16
+Materials:
+  - Diffuse:
+      Color: [1, 1, 1]
 Shapes:
   - Sphere:
       Center: [0, -100.5, -2.5]
       Radius: 100
+      Material: 0
   - Sphere:
       Center: [0, 0, -2.5]
       Radius: 0.5
+      Material: 0
   - Sphere:
       Center: [1.5, 0.5, -4]
       Radius: 0.25
+      Material: 0

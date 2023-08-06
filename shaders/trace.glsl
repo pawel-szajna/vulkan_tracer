@@ -1,11 +1,11 @@
-vec4 trace(Ray ray)
+vec4 trace(Ray ray, DataUsage usage)
 {
     vec4 color = vec4(0, 0, 0, 0);
     float multiplier = 1;
 
     for (uint i = 0; i < inputs.reflectionsLimit; ++i)
     {
-        CollisionOpt collision = Scene_hit(ray, 0.001, 1.0 / 0.0);
+        CollisionOpt collision = Scene_hit(ray, usage, 0.001, 1.0 / 0.0);
         if (collision.valid)
         {
             vec3 target = collision.point + collision.normal + randomInSphere();
