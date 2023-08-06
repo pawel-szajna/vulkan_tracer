@@ -1,0 +1,54 @@
+{
+    "depends": ["basic_types"],
+    "gen": [
+        {
+            "kind": "constant",
+            "cpp": true,
+            "glsl": true,
+            "type": "size_t",
+            "name": "shapesLimit",
+            "value": 16
+        },
+        {
+            "kind": "constant",
+            "cpp": true,
+            "glsl": true,
+            "type": "size_t",
+            "name": "materialsLimit",
+            "value": 8
+        },
+        {
+            "kind": "constant",
+            "cpp": true,
+            "glsl": true,
+            "type": "size_t",
+            "name": "vectorsLimit",
+            "value": 32
+        },
+        {
+            "kind": "constant",
+            "cpp": true,
+            "glsl": true,
+            "type": "size_t",
+            "name": "scalarsLimit",
+            "value": 32
+        },
+        {
+            "kind": "constant",
+            "cpp": true,
+            "glsl": true,
+            "type": "size_t",
+            "name": "integersLimit",
+            "value": 32
+        },
+
+        {
+            "kind": "constant",
+            "cpp": false,
+            "glsl": true,
+            "type": "uint",
+            "name": "ShapeType_Sphere",
+            "value": 1
+        }
+    ]
+}

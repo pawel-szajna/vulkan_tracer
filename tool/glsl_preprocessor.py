@@ -14,14 +14,18 @@ def get_file_contents(filename):
 
 
 def preprocess_file(filename):
-    filename = "{}{}".format(path, filename)
+    if not filename.startswith("/"):
+        filename = "{}{}".format(path, filename)
     if filename in already_included:
         return ""
     data = get_file_contents(filename)
     output = "/* {} */\n\n".format(filename)
     for line in data:
         if line.startswith("#include"):
-            output += preprocess_file("{}.glsl".format(line[len("#include"):].strip()))
+            include_value = line[len("#include"):].strip()
+            if include_value.startswith("generated"):
+                include_value = "{}/{}".format(gen_dir, include_value[len("generated"):].strip())
+            output += preprocess_file("{}.glsl".format(include_value))
         else:
             output += line
     output += "\n"
@@ -30,6 +34,7 @@ def preprocess_file(filename):
 
 target = sys.argv[1]
 output = sys.argv[2]
+gen_dir = sys.argv[3]
 file = target
 path_pos = target.rfind('/')
 if path_pos == -1:

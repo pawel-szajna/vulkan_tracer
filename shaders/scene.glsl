@@ -6,7 +6,7 @@ CollisionOpt Scene_hit(Ray ray, float min, float max)
     uint vectorId = 0;
     uint scalarId = 0;
 
-    for (uint i = 0; i < inputs.shapeCount; ++i)
+    for (uint i = 0; i < inputs.shapesCount; ++i)
     {
         CollisionOpt current = NoCollision;
 

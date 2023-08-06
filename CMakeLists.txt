@@ -1,4 +1,3 @@
-
 cmake_minimum_required(VERSION 3.24)
 project(vulkan_Test)
 
@@ -23,12 +22,12 @@ message(STATUS "Found GLSL compiler: ${GLSL_COMPILER}")
 
 get_filename_component(GLSL_COMPILER_NAME ${GLSL_COMPILER} NAME_WE)
 
+set(INTERFACE_DIR "${CMAKE_BINARY_DIR}/generated")
+
 set(GLSL_SOURCES
     shaders/main.glsl)
 
 file(GLOB GLSL_FILES CONFIGURE_DEPENDS "${CMAKE_SOURCE_DIR}/shaders/*.glsl")
-message(${GLSL_FILES})
-
 foreach(GLSL_SOURCE ${GLSL_SOURCES})
     get_filename_component(FILE_NAME ${GLSL_SOURCE} NAME_WE)
     set(SPIRV_COMPILED "${CMAKE_BINARY_DIR}/${FILE_NAME}.spv")
@@ -40,7 +39,7 @@ foreach(GLSL_SOURCE ${GLSL_SOURCES})
     endif()
     add_custom_command(
         OUTPUT "${SPIRV_COMPILED}"
-        COMMAND ${PYTHON_INTERPRETER} ARGS "${CMAKE_SOURCE_DIR}/tool/glsl_preprocessor.py" "${CMAKE_SOURCE_DIR}/${GLSL_SOURCE}" "${PREPROCESSED}"
+        COMMAND ${PYTHON_INTERPRETER} ARGS "${CMAKE_SOURCE_DIR}/tool/glsl_preprocessor.py" "${CMAKE_SOURCE_DIR}/${GLSL_SOURCE}" "${PREPROCESSED}" "${INTERFACE_DIR}"
         COMMAND ${GLSL_COMPILER} ARGS ${GLSL_ARGS}
         DEPENDS ${GLSL_FILES})
     list(APPEND SHADER_BINARIES ${SPIRV_COMPILED})
@@ -49,6 +48,32 @@ endforeach()
 add_custom_target(
     shaders
     DEPENDS ${SHADER_BINARIES}
+)
+
+file(GLOB INTERFACE_DEFINITIONS CONFIGURE_DEPENDS "${CMAKE_SOURCE_DIR}/interface/*.json")
+foreach(INTERFACE_DEFINITION ${INTERFACE_DEFINITIONS})
+    get_filename_component(FILE_NAME ${INTERFACE_DEFINITION} NAME_WE)
+    set(INTERFACE_CPP "${INTERFACE_DIR}/${FILE_NAME}.hpp")
+    set(INTERFACE_GLSL "${INTERFACE_DIR}/${FILE_NAME}.glsl")
+    add_custom_command(
+        OUTPUT "${INTERFACE_CPP}"
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${INTERFACE_DIR}
+        COMMAND ${PYTHON_INTERPRETER} ARGS "${CMAKE_SOURCE_DIR}/tool/interface_generator.py" ${INTERFACE_DEFINITION} ${INTERFACE_DIR} cpp
+        DEPENDS ${INTERFACE_DEFINITION}
+    )
+    add_custom_command(
+        OUTPUT "${INTERFACE_GLSL}"
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${INTERFACE_DIR}
+        COMMAND ${PYTHON_INTERPRETER} ARGS "${CMAKE_SOURCE_DIR}/tool/interface_generator.py" ${INTERFACE_DEFINITION} ${INTERFACE_DIR} glsl
+        DEPENDS ${INTERFACE_DEFINITION}
+    )
+    list(APPEND INTERFACE_FILES ${INTERFACE_CPP})
+    list(APPEND INTERFACE_FILES ${INTERFACE_GLSL})
+endforeach()
+
+add_custom_target(
+    interfaces
+    DEPENDS ${INTERFACE_FILES}
 )
 
 add_executable(
@@ -64,6 +89,7 @@ add_executable(
 
 add_dependencies(
     vulkan_tracer
+        interfaces
         shaders
 )
 
@@ -73,6 +99,7 @@ target_include_directories(
         include
         ${Vulkan_INCLUDE_DIRS}
         ${Vulkan_INCLUDE_DIRS_Extra}
+        ${INTERFACE_DIR}
 )
 
 target_link_directories(

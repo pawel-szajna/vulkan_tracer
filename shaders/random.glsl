@@ -40,5 +40,5 @@ vec3 randomInSphere()
 
 void initializeRng(uint x, uint y)
 {
-    inputs.randomSeed += x + inputs.width * y;
+    inputs.randomSeed += x + inputs.renderWidth * y;
 }

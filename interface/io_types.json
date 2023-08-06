@@ -1,0 +1,44 @@
+{
+    "depends": ["basic_types", "constants"],
+    "gen": [
+        {
+            "kind": "buffer",
+            "cpp": true,
+            "glsl": true,
+            "set": 0,
+            "binding": 0,
+            "name": "InputData",
+            "bufferName": "inputs",
+            "fields": [
+                { "type": "uint", "name": "randomSeed" },
+                { "type": "uint", "name": "samplesPerShader" },
+                { "type": "uint", "name": "reflectionsLimit" },
+
+                { "type": "uint", "name": "renderWidth" },
+                { "type": "uint", "name": "renderHeight" },
+
+                { "type": "uint", "name": "shapesCount" },
+                { "type": "uint", "name": "shapes", "size": "shapesLimit" },
+
+                { "type": "uint", "name": "materialsCount" },
+                { "type": "uint", "name": "materials", "size": "materialsLimit" },
+
+                { "type": "vec4", "name": "vectors", "size": "vectorsLimit" },
+                { "type": "float", "name": "scalars", "size": "scalarsLimit" },
+                { "type": "int", "name": "integers", "size": "integersLimit" }
+            ]
+        },
+        {
+            "kind": "buffer",
+            "cpp": false,
+            "glsl": true,
+            "set": 0,
+            "binding": 1,
+            "name": "OutputData",
+            "bufferName": "results",
+            "fields": [
+                { "type": "vec4", "name": "pixels[]" }
+            ]
+        }
+    ]
+}

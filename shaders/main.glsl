@@ -1,7 +1,8 @@
 #version 430
 
-#include constants
-#include io_types
+#include generated constants
+#include generated io_types
+
 #include random
 
 #include ray
@@ -28,12 +29,12 @@ void main()
     {
         Ray ray = {
             vec3(0.0, 0.0, 0.0),
-            screenStart + vec3(float(x + random()) / inputs.width,
-                               float(y + random()) / inputs.width,
+            screenStart + vec3(float(x + random()) / inputs.renderWidth,
+                               float(y + random()) / inputs.renderWidth,
                                0.0)
         };
 
-        results.pixels[x + inputs.width * y] += weight * trace(ray);
+        results.pixels[x + inputs.renderWidth * y] += weight * trace(ray);
     }
 
     debug(x, y);
