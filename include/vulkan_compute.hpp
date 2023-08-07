@@ -13,6 +13,11 @@
 #include "helpers.hpp"
 #include "timers.hpp"
 
+#if defined(DebugBuild) and defined(__unix__) and not defined(__apple__)
+#define DebugRenderdoc
+#include <renderdoc_app.h>
+#endif
+
 class VulkanCompute
 {
 public:
@@ -29,14 +34,14 @@ public:
     static void listDevices();
 
     /// @return Time it actually took to execute the load
-    u64 execute(u64 timeout = 1000000000);
+    u64 execute();
 
     void download(u8* outputData);
 
     template<typename T>
     void upload(const T& inputData)
     {
-        SPDLOG_INFO("Uploading data to GPU memory");
+        SPDLOG_DEBUG("Uploading data to GPU memory");
         if (sizeof(T) != inputMemorySize)
         {
             SPDLOG_WARN("Sending {} bytes to {} bytes sized buffer",
@@ -80,4 +85,8 @@ private:
     vk::CommandPool commandPool;
     vk::Queue queue;
     vk::Fence fence;
+
+    #if defined(DebugRenderdoc)
+    RENDERDOC_API_1_6_0* renderdocApi = nullptr;
+    #endif
 };

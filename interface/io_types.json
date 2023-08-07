@@ -12,7 +12,10 @@
             "fields": [
                 { "type": "uint", "name": "randomSeed" },
                 { "type": "uint", "name": "samplesPerShader" },
+                { "type": "uint", "name": "offsetX" },
+                { "type": "uint", "name": "offsetY" },
                 { "type": "uint", "name": "reflectionsLimit" },
+                { "type": "float", "name": "weight" },
 
                 { "type": "uint", "name": "renderWidth" },
                 { "type": "uint", "name": "renderHeight" },

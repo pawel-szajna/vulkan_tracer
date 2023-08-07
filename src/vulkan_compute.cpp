@@ -19,12 +19,43 @@ VulkanCompute::VulkanCompute(usize inputMemorySize,
     , jobsZ{jobsZ}
 {
     SPDLOG_INFO("Creating Vulkan compute helper");
+
+    #if defined(DebugRenderdoc)
+    SPDLOG_DEBUG("Setting up RenderDoc API");
+    auto *mod = dlopen("librenderdoc.so", RTLD_NOW | RTLD_NOLOAD);
+    if (mod == nullptr)
+    {
+        SPDLOG_INFO("RenderDoc API unavailable");
+    }
+    else
+    {
+        auto renderdocGetApi = (pRENDERDOC_GetAPI)dlsym(mod, "RENDERDOC_GetAPI");
+        auto result = renderdocGetApi(eRENDERDOC_API_Version_1_6_0, (void**)&renderdocApi);
+        SPDLOG_INFO("RENDERDOC_GetAPI result: {}", result);
+    }
+    #endif
+
     SPDLOG_DEBUG("Requested memory: input buffer {} bytes, output buffer {} bytes", inputMemorySize, outputMemorySize);
     SPDLOG_DEBUG("Shader file: {}", shader);
 
     auto timer = Timers::create("Vulkan setup");
 
-    vk::InstanceCreateInfo instanceInfo{vk::InstanceCreateFlags{}, {}, {}, {}};
+    std::vector<const char*> validationLayers{};
+    #if defined(DebugBuild)
+    auto availableLayers = vk::enumerateInstanceLayerProperties();
+    SPDLOG_DEBUG("Available instance layers:");
+    constexpr static std::string_view khronosValidationLayerName{"VK_LAYER_KHRONOS_validation"};
+    for (const vk::LayerProperties& layer : availableLayers)
+    {
+        SPDLOG_DEBUG("    {}: {}", layer.layerName, layer.description);
+        if (layer.layerName == khronosValidationLayerName)
+        {
+            validationLayers.push_back(khronosValidationLayerName.data());
+        }
+    }
+    #endif
+
+    vk::InstanceCreateInfo instanceInfo{vk::InstanceCreateFlags{}, {}, validationLayers, {}};
     instance = vk::createInstance(instanceInfo);
 
     createDevice(deviceId);
@@ -151,15 +182,13 @@ void VulkanCompute::allocateMemory()
                                                inputMemorySize,
                                                vk::BufferUsageFlagBits::eStorageBuffer,
                                                vk::SharingMode::eExclusive,
-                                               1,
-                                               &queueIndex};
+                                               {}};
 
     vk::BufferCreateInfo outputBufferCreateInfo{vk::BufferCreateFlags{},
                                                 outputMemorySize,
                                                 vk::BufferUsageFlagBits::eStorageBuffer,
                                                 vk::SharingMode::eExclusive,
-                                                1,
-                                                &queueIndex};
+                                                {}};
 
     inputBuffer  = device.createBuffer(inputBufferCreateInfo);
     outputBuffer = device.createBuffer(outputBufferCreateInfo);
@@ -255,7 +284,8 @@ void VulkanCompute::createPipeline()
         vk::WriteDescriptorSet{descriptorSet, 1, 0, 1, vk::DescriptorType::eStorageBuffer, nullptr, &outputBufferInfo}};
     device.updateDescriptorSets(writeDescriptorSets, {});
 
-    vk::CommandPoolCreateInfo commandPoolCreateInfo{{}, queueIndex};
+    vk::CommandPoolCreateFlags commandPoolCreateFlags = vk::CommandPoolCreateFlagBits::eResetCommandBuffer;
+    vk::CommandPoolCreateInfo commandPoolCreateInfo{commandPoolCreateFlags, queueIndex};
     commandPool = device.createCommandPool(commandPoolCreateInfo);
 
     vk::CommandBufferAllocateInfo commandBufferAllocateInfo{commandPool, vk::CommandBufferLevel::ePrimary, 1};
@@ -263,10 +293,17 @@ void VulkanCompute::createPipeline()
     commandBuffer       = commandBuffers.front();
 }
 
-u64 VulkanCompute::execute(u64 timeout)
+u64 VulkanCompute::execute()
 {
-    SPDLOG_INFO("Submitting execution to GPU");
-    SPDLOG_DEBUG("Execution time limit is set to {} ms", static_cast<float>(timeout / 1e3) / 1e3);
+    SPDLOG_DEBUG("Submitting execution to GPU");
+
+    #if defined(DebugRenderdoc)
+    if (renderdocApi != nullptr)
+    {
+        SPDLOG_INFO("RenderDoc API: start frame");
+        renderdocApi->StartFrameCapture(nullptr, nullptr);
+    }
+    #endif
 
     auto timer = Timers::create("Compute shader execution");
 
@@ -277,17 +314,38 @@ u64 VulkanCompute::execute(u64 timeout)
     commandBuffer.dispatch(jobsX, jobsY, jobsZ);
     commandBuffer.end();
 
-    vk::SubmitInfo submitInfo{{}, {}, commandBuffer};
-    queue.submit(submitInfo, fence);
-
-    if (device.waitForFences(fence, true, timeout) == vk::Result::eTimeout)
+    try
     {
-        SPDLOG_ERROR("Execution timed out");
-        throw std::runtime_error("Timeout");
+        vk::SubmitInfo submitInfo{{}, {}, commandBuffer};
+        queue.submit(submitInfo, fence);
+        if (device.waitForFences(fence, true, 10'000'000'000) == vk::Result::eTimeout)
+        {
+            SPDLOG_WARN("GPU timeout (calculation took over 10 seconds)");
+        }
+    }
+    catch (const vk::Error& e)
+    {
+        SPDLOG_ERROR("Vulkan error during execution: {}", e.what());
+        #if defined(DebugRenderdoc)
+        if (renderdocApi != nullptr)
+        {
+            SPDLOG_INFO("RenderDoc API: end frame");
+            renderdocApi->EndFrameCapture(nullptr, nullptr);
+        }
+        #endif
+        throw;
     }
 
     commandBuffer.reset(vk::CommandBufferResetFlags{});
     device.resetFences(fence);
+
+    #if defined(DebugRenderdoc)
+    if (renderdocApi != nullptr)
+    {
+        SPDLOG_INFO("RenderDoc API: end frame");
+        renderdocApi->EndFrameCapture(nullptr, nullptr);
+    }
+    #endif
 
     return timer.finish();
 }

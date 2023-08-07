@@ -2,6 +2,7 @@
 
 #include <chrono>
 #include <ostream>
+#include <vector>
 
 #include "io_types.hpp"
 

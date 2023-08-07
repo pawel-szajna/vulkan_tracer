@@ -69,7 +69,7 @@ int main(int argc, char** argv)
         auto width  = scene.getResolutionWidth();
         auto height = scene.getResolutionHeight();
 
-        VulkanCompute vc{sizeof(InputData), width * height * sizeof(float) * 4, "main.spv", width, height, 1, deviceId};
+        VulkanCompute vc{sizeof(InputData), width * height * sizeof(float) * 4, "main.spv", 64, 64, 1, deviceId};
         ComputeRunner runner{vc, scene.build()};
 
         runner.execute(scene.getTargetIterations());

@@ -1,9 +1,9 @@
 Configuration:
   Resolution:
-    Width: 1920
-    Height: 1080
+    Width: 1280
+    Height: 704
   SamplesPerShader: 1
-  TotalSamples: 4
+  TotalSamples: 250
   ReflectionsLimit: 32
 Background:
   Color: [440, 760, 40]

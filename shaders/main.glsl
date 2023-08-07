@@ -27,16 +27,17 @@
 
 void main()
 {
-    uint x = gl_GlobalInvocationID.x;
-    uint y = gl_GlobalInvocationID.y;
+    uint x = gl_GlobalInvocationID.x + inputs.offsetX;
+    uint y = gl_GlobalInvocationID.y + inputs.offsetY;
     initializeRng(x, y);
 
     uint samples = inputs.samplesPerShader;
-    float weight = 1.0 / samples;
 
     vec3 screenStart =
         vec3(-0.5, -0.5 * (float(inputs.renderHeight) / float(inputs.renderWidth)), -1.0);
     DataUsage usage = materialsDataUsage(inputs.materialsCount);
+
+    vec3 pixel = vec3(0, 0, 0);
 
     for (uint i = 0; i < samples; ++i)
     {
@@ -48,9 +49,12 @@ void main()
             random(380, 780)
         };
 
-        results.pixels[x + inputs.renderWidth * y] +=
-            weight * trace(ray, usage) * vec4(colorSpaceX(ray.wavelength),
-                                              colorSpaceY(ray.wavelength),
-                                              colorSpaceZ(ray.wavelength), 0);
+        pixel += inputs.weight
+               * trace(ray, usage)
+               * vec3(colorSpaceX(ray.wavelength),
+                      colorSpaceY(ray.wavelength),
+                      colorSpaceZ(ray.wavelength));
     }
+
+    results.pixels[x + inputs.renderWidth * y] += vec4(pixel, 0);
 }
