@@ -127,6 +127,18 @@ void SceneBuilder::addShapeCloud(vec3 center, float radius, float intensity, i32
     addShape(ShapeType::Cloud);
 }
 
+void SceneBuilder::addShapePrism(float top, float bottom, std::vector<vec3> vertices, i32 material)
+{
+    addScalar(top);
+    addScalar(bottom);
+    addInteger(material);
+    for (const auto& vertex : vertices)
+    {
+        addVector(vertex);
+    }
+    addShape(ShapeType::Prism);
+}
+
 void SceneBuilder::addMaterial(MaterialType material)
 {
     if (inputs.materialsCount == materialsLimit)

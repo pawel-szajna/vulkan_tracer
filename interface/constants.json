@@ -58,6 +58,14 @@
             "name": "ShapeType_Cloud",
             "value": 2
         },
+        {
+            "kind": "constant",
+            "cpp": false,
+            "glsl": true,
+            "type": "uint",
+            "name": "ShapeType_Prism",
+            "value": 3
+        },
 
         {
             "kind": "constant",

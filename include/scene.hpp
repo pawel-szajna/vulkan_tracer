@@ -2,11 +2,14 @@
 
 #include "io_types.hpp"
 
+#include <vector>
+
 enum class ShapeType : uint32_t
 {
     Invalid,
     Sphere,
     Cloud,
+    Prism,
 };
 
 enum class MaterialType : uint32_t
@@ -42,6 +45,7 @@ public:
 
     void addShapeSphere(vec3 center, float radius, i32 material);
     void addShapeCloud(vec3 center, float radius, float intensity, i32 material);
+    void addShapePrism(float top, float bottom, std::vector<vec3> vertices, i32 material);
 
     [[nodiscard]] u32 getResolutionWidth() const;
     [[nodiscard]] u32 getResolutionHeight() const;

@@ -10,6 +10,7 @@
 #include types/ray
 #include types/collision
 
+#include shapes/prism
 #include shapes/sphere
 #include shapes/cloud
 

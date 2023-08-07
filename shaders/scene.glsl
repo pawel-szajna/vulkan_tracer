@@ -67,6 +67,18 @@ CollisionOpt Scene_hit(Ray ray, DataUsage usage, float min, float max)
                 integerId += 1;
                 break;
             }
+        case ShapeType_Prism:
+            {
+                float top = inputs.scalars[scalarId];
+                float bottom = inputs.scalars[scalarId+1];
+                int vertices = inputs.integers[integerId];
+                int material = inputs.integers[integerId+1];
+                current = Prism_hit(top, bottom, vertices, vectorId, material, ray, min, closest.position);
+                scalarId += 2;
+                integerId += 2;
+                vectorId += vertices;
+                break;
+            }
         default:
             break;
         }

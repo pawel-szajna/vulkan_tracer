@@ -1,5 +1,7 @@
 #include "scene_reader.hpp"
 
+#include <algorithm>
+#include <iterator>
 #include <map>
 #include <spdlog/spdlog.h>
 #include <stdexcept>
@@ -35,6 +37,7 @@ private:
     void readShape(const YAML::Node& shape);
     void readSphere(const YAML::Node& sphere);
     void readCloud(const YAML::Node& cloud);
+    void readPrism(const YAML::Node& prism);
 
     i32 readMaterial(const YAML::Node& source);
     void saveMaterial(i32 id, const YAML::Node& node);
@@ -140,6 +143,12 @@ void SceneReaderImpl::readShape(const YAML::Node& shape)
         readCloud(shape["Cloud"]);
         return;
     }
+
+    if (shape["Prism"])
+    {
+        readPrism(shape["Prism"]);
+        return;
+    }
 }
 
 void SceneReaderImpl::readSphere(const YAML::Node& sphere)
@@ -155,6 +164,20 @@ void SceneReaderImpl::readCloud(const YAML::Node& cloud)
                         cloud["Radius"].as<float>(),
                         cloud["Density"].as<float>(),
                         readMaterial(cloud["Material"]));
+}
+
+void SceneReaderImpl::readPrism(const YAML::Node& prism)
+{
+    std::vector<vec3> vertices;
+    std::transform(prism["Vertices"].begin(),
+                   prism["Vertices"].end(),
+                   std::back_inserter(vertices),
+                   [](const YAML::Node& vertex) { return readVector(vertex); });
+
+    scene.addShapePrism(prism["Top"].as<float>(),
+                        prism["Bottom"].as<float>(),
+                        std::move(vertices),
+                        readMaterial(prism["Material"]));
 }
 
 void SceneReaderImpl::readMaterials()
