@@ -138,5 +138,6 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
         vulkan_tracer
         PRIVATE
             SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_DEBUG
+            DebugBuild
     )
 endif()

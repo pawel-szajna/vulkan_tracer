@@ -16,7 +16,7 @@ Timers::Timers()
 Timers::~Timers()
 {
     auto now      = std::chrono::system_clock::now();
-    auto duration = (now - creation).count();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(now - creation).count();
 
     u64 sum{};
 

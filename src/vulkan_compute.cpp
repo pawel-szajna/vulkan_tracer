@@ -5,8 +5,13 @@
 #include <spdlog/spdlog.h>
 #include <stdexcept>
 
-VulkanCompute::VulkanCompute(
-    usize inputMemorySize, usize outputMemorySize, std::string_view shader, u32 jobsX, u32 jobsY, u32 jobsZ)
+VulkanCompute::VulkanCompute(usize inputMemorySize,
+                             usize outputMemorySize,
+                             std::string_view shader,
+                             u32 jobsX,
+                             u32 jobsY,
+                             u32 jobsZ,
+                             i32 deviceId)
     : inputMemorySize{inputMemorySize}
     , outputMemorySize{outputMemorySize}
     , jobsX{jobsX}
@@ -22,7 +27,7 @@ VulkanCompute::VulkanCompute(
     vk::InstanceCreateInfo instanceInfo{vk::InstanceCreateFlags{}, {}, {}, {}};
     instance = vk::createInstance(instanceInfo);
 
-    createDevice();
+    createDevice(deviceId);
     allocateMemory();
     loadShader(shader);
     createPipeline();
@@ -52,43 +57,55 @@ VulkanCompute::~VulkanCompute()
     instance.destroy();
 }
 
-void VulkanCompute::createDevice()
+void VulkanCompute::createDevice(i32 deviceId)
 {
     auto devices = instance.enumeratePhysicalDevices();
-    SPDLOG_DEBUG("Available devices:");
-    for (const auto& dev : devices)
+
+    if (deviceId < 0)
     {
-        auto properties = dev.getProperties();
-        SPDLOG_DEBUG("    {} - {}, API version {}.{}, compute shared memory {} KB",
-                     vk::to_string(properties.deviceType),
-                     std::string_view(properties.deviceName),
-                     VK_VERSION_MAJOR(properties.apiVersion),
-                     VK_VERSION_MINOR(properties.apiVersion),
-                     properties.limits.maxComputeSharedMemorySize / 1024);
+        auto deviceIt = std::find_if(devices.begin(),
+                                     devices.end(),
+                                     [](const vk::PhysicalDevice& d)
+                                     {
+                                         auto type = d.getProperties().deviceType;
+                                         return type == vk::PhysicalDeviceType::eDiscreteGpu or
+                                                type == vk::PhysicalDeviceType::eIntegratedGpu;
+                                     });
+
+        if (deviceIt == devices.end())
+        {
+            throw std::runtime_error("No GPU");
+        }
+
+        physicalDevice = *deviceIt;
+    }
+    else
+    {
+        if (deviceId >= devices.size())
+        {
+            throw std::invalid_argument("Invalid device ID provided");
+        }
+
+        physicalDevice = *(devices.begin() + deviceId);
     }
 
-    auto deviceIt = std::find_if(devices.begin(),
-                                 devices.end(),
-                                 [](const vk::PhysicalDevice& d)
-                                 {
-                                     auto type = d.getProperties().deviceType;
-                                     return type == vk::PhysicalDeviceType::eDiscreteGpu or
-                                            type == vk::PhysicalDeviceType::eIntegratedGpu;
-                                 });
-
-    if (deviceIt == devices.end())
-    {
-        throw std::runtime_error("No gpu");
-    }
-
-    physicalDevice = *deviceIt;
     SPDLOG_INFO("Using physical device {}", std::string_view(physicalDevice.getProperties().deviceName));
 
     auto queueFamilies = physicalDevice.getQueueFamilyProperties();
+
+    #if defined(DebugBuild)
+    SPDLOG_DEBUG("Available queue families:");
+    for (const vk::QueueFamilyProperties& family : queueFamilies)
+    {
+        SPDLOG_DEBUG("    Flags: {}, Queue count: {}", vk::to_string(family.queueFlags), family.queueCount);
+    }
+    #endif
+
     auto queueIt =
         std::find_if(queueFamilies.begin(),
                      queueFamilies.end(),
                      [](const vk::QueueFamilyProperties& q) { return q.queueFlags & vk::QueueFlagBits::eCompute; });
+
     if (queueIt == queueFamilies.end())
     {
         throw std::runtime_error("No compute units");
@@ -99,7 +116,31 @@ void VulkanCompute::createDevice()
     auto queuePriorities  = {1.0f};
     auto queueCreateInfo  = vk::DeviceQueueCreateInfo{vk::DeviceQueueCreateFlags{}, queueIndex, queuePriorities};
     auto deviceCreateInfo = vk::DeviceCreateInfo{vk::DeviceCreateFlags{}, queueCreateInfo};
-    device                = physicalDevice.createDevice(deviceCreateInfo);
+
+    device = physicalDevice.createDevice(deviceCreateInfo);
+}
+
+void VulkanCompute::listDevices()
+{
+    vk::InstanceCreateInfo instanceInfo{vk::InstanceCreateFlags{}, {}, {}, {}};
+    auto instance = vk::createInstance(instanceInfo);
+
+    u32 id{};
+
+    SPDLOG_INFO("Available devices:");
+    auto devices = instance.enumeratePhysicalDevices();
+    for (const auto& dev : devices)
+    {
+        auto properties = dev.getProperties();
+        SPDLOG_INFO("    {}: {} - {}, API version {}.{}",
+                    id++,
+                    vk::to_string(properties.deviceType),
+                    std::string_view(properties.deviceName),
+                    VK_VERSION_MAJOR(properties.apiVersion),
+                    VK_VERSION_MINOR(properties.apiVersion));
+    }
+
+    instance.destroy();
 }
 
 void VulkanCompute::allocateMemory()
@@ -127,7 +168,8 @@ void VulkanCompute::allocateMemory()
     auto outputMemoryReq = device.getBufferMemoryRequirements(outputBuffer);
 
     vk::PhysicalDeviceMemoryProperties memoryProperties = physicalDevice.getMemoryProperties();
-    auto memoryTypeIt                                   = std::find_if(memoryProperties.memoryTypes.begin(),
+
+    auto memoryTypeIt = std::find_if(memoryProperties.memoryTypes.begin(),
                                      memoryProperties.memoryTypes.end(),
                                      [](const vk::MemoryType& mt)
                                      {

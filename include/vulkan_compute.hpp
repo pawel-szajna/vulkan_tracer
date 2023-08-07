@@ -22,8 +22,11 @@ public:
                   std::string_view shader,
                   u32 jobsX,
                   u32 jobsY,
-                  u32 jobsZ);
+                  u32 jobsZ,
+                  i32 deviceId);
     ~VulkanCompute();
+
+    static void listDevices();
 
     /// @return Time it actually took to execute the load
     u64 execute(u64 timeout = 1000000000);
@@ -48,7 +51,7 @@ public:
 
 private:
 
-    void createDevice();
+    void createDevice(i32 deviceId);
     void allocateMemory();
     void loadShader(std::string_view filename);
     void createPipeline();
