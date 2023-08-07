@@ -104,6 +104,7 @@ target_include_directories(
     vulkan_tracer
     PRIVATE
         include
+        externals
         ${Vulkan_INCLUDE_DIRS}
         ${Vulkan_INCLUDE_DIRS_Extra}
         ${INTERFACE_DIR}
@@ -137,11 +138,16 @@ else()
     )
 endif()
 
+target_compile_definitions(
+    vulkan_tracer
+    PRIVATE
+        SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_DEBUG
+)
+
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     target_compile_definitions(
         vulkan_tracer
         PRIVATE
-            SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_DEBUG
             DebugBuild
     )
 endif()

@@ -16,6 +16,7 @@ Dependencies
       works on Apple platforms)
 * C++ Libraries:
     * **argparse** – argument parsing
+    * **indicators** – progress display (included single-header)
     * **spdlog** – application logging
     * **yaml-cpp** – configuration
 

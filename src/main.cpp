@@ -5,17 +5,34 @@
 #include "timers.hpp"
 #include "vulkan_compute.hpp"
 
+#include <memory>
+
 #include <argparse/argparse.hpp>
 #include <spdlog/spdlog.h>
+#include <spdlog/sinks/basic_file_sink.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
+
+#if defined(__unix__) or defined(__APPLE__)
+#include <unistd.h>
+#else
+#define isatty(...) false
+#endif
 
 int main(int argc, char** argv)
 {
+    if (isatty(fileno(stdout)))
+    {
+        auto fileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("vulkan_tracer.log");
+        auto consoleSink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+        fileSink->set_level(spdlog::level::debug);
+        consoleSink->set_level(spdlog::level::warn);
+        auto logger = std::make_shared<spdlog::logger>("tracer", spdlog::sinks_init_list{fileSink, consoleSink});
+        logger->set_level(spdlog::level::debug);
+        spdlog::set_default_logger(logger);
+    }
+
     SPDLOG_INFO("GPU Raytracer startup");
     Timers timers{};
-
-    #if defined(DebugBuild)
-    spdlog::set_level(spdlog::level::debug);
-    #endif
 
     argparse::ArgumentParser args("vulkan_tracer");
     args.add_argument("files").help("YML file with scene definition").remaining();
@@ -70,7 +87,7 @@ int main(int argc, char** argv)
         auto height = scene.getResolutionHeight();
 
         VulkanCompute vc{sizeof(InputData), width * height * sizeof(float) * 4, "main.spv", 64, 64, 1, deviceId};
-        ComputeRunner runner{vc, scene.build()};
+        ComputeRunner runner{vc, scene.build(), file};
 
         runner.execute(scene.getTargetIterations());
 
