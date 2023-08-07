@@ -47,7 +47,7 @@ VulkanCompute::VulkanCompute(usize inputMemorySize,
     constexpr static std::string_view khronosValidationLayerName{"VK_LAYER_KHRONOS_validation"};
     for (const vk::LayerProperties& layer : availableLayers)
     {
-        SPDLOG_DEBUG("    {}: {}", layer.layerName, layer.description);
+        SPDLOG_DEBUG("    {}: {}", std::string_view(layer.layerName), std::string_view(layer.description));
         if (layer.layerName == khronosValidationLayerName)
         {
             validationLayers.push_back(khronosValidationLayerName.data());
