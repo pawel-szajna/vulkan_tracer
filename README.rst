@@ -36,4 +36,5 @@ Compatibility
 -------------
 
 This has only been tested on Apple M1 (and it worked), and on Intel i5-10310U (and it
-didn't work, but no investigation was performed).
+worked), and on GeForce MX 150 (and it worked), checked with macOS, Linux, and Windows,
+so pretty much should work everywhere.
