@@ -3,6 +3,7 @@
 #include "io_types.hpp"
 
 #include <atomic>
+#include <map>
 #include <string_view>
 #include <vector>
 
@@ -12,10 +13,12 @@ class ComputeRunner
 {
 public:
 
+    using ChunkProgressMap = std::map<std::pair<u32, u32>, std::pair<u32, u32>>;
+
     ComputeRunner(VulkanCompute& vulkan, InputData scene, std::string_view name);
     void execute(u32 iterations);
     void abort();
-    std::vector<float> results();
+    std::pair<std::vector<float>, ComputeRunner::ChunkProgressMap*> results();
 
 private:
 
@@ -26,4 +29,6 @@ private:
     std::string_view name;
 
     std::atomic<bool> running;
+
+    ChunkProgressMap chunkProgress;
 };

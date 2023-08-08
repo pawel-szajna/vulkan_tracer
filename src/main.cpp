@@ -120,7 +120,8 @@ int main(int argc, char** argv)
             runnerThread.join();
         }
 
-        save(runner.results(), width, height, fmt::format("{}_output.ppm", file));
+        auto [results, _] = runner.results();
+        save(results, width, height, fmt::format("{}_output.ppm", file));
     }
 
     #if not defined(DebugBuild)

@@ -47,7 +47,7 @@ void ComputeRunner::execute(u32 iterations)
     u32 chunksHorizontal = scene.renderWidth / chunkSize;
     u32 chunksVertical = scene.renderHeight / chunkSize;
 
-    std::map<std::pair<u32, u32>, std::pair<u32, u32>> chunkProgress{};
+    chunkProgress.clear();
 
     for (u32 i = 0; i < chunksHorizontal; ++i)
     {
@@ -111,8 +111,8 @@ void ComputeRunner::execute(u32 iterations)
     indicators::show_console_cursor(true);
 }
 
-std::vector<float> ComputeRunner::results()
+std::pair<std::vector<float>, ComputeRunner::ChunkProgressMap*> ComputeRunner::results()
 {
     vulkan.download(reinterpret_cast<u8*>(data.data()));
-    return data;
+    return std::make_pair(data, &chunkProgress);
 }
