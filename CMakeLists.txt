@@ -12,6 +12,8 @@ else()
     find_package(Vulkan REQUIRED)
 endif()
 
+option(LIVE_VIEW "Enable rendering live preview")
+
 find_package(argparse REQUIRED)
 find_package(spdlog REQUIRED)
 find_package(yaml-cpp REQUIRED)
@@ -35,11 +37,7 @@ foreach(GLSL_SOURCE ${GLSL_SOURCES})
     if(${GLSL_COMPILER_NAME} STREQUAL "glslc")
         set(GLSL_ARGS -fshader-stage=compute -o ${SPIRV_COMPILED} ${PREPROCESSED})
     else()
-        if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-            set(GLSL_ARGS -gVS -V -S comp -o ${SPIRV_COMPILED} ${PREPROCESSED})
-        else()
-            set(GLSL_ARGS -V -S comp -o ${SPIRV_COMPILED} ${PREPROCESSED})
-        endif()
+        set(GLSL_ARGS -V -S comp -o ${SPIRV_COMPILED} ${PREPROCESSED})
     endif()
     add_custom_command(
         OUTPUT "${SPIRV_COMPILED}"
@@ -106,6 +104,7 @@ add_custom_target(
 add_executable(
     vulkan_tracer
         src/helpers.cpp
+        src/live_view.cpp
         src/main.cpp
         src/runner.cpp
         src/scene.cpp
@@ -155,6 +154,20 @@ else()
         vulkan_tracer
         PRIVATE
             Vulkan::Vulkan
+    )
+endif()
+
+if(LIVE_VIEW)
+    find_package(SDL2 REQUIRED COMPONENTS SDL2)
+    target_link_libraries(
+        vulkan_tracer
+        PRIVATE
+            ${SDL2_LIBRARIES}
+    )
+    target_compile_definitions(
+        vulkan_tracer
+        PRIVATE
+            HAS_LIVE_VIEW
     )
 endif()
 

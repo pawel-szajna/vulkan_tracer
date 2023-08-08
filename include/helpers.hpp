@@ -40,3 +40,5 @@ std::ostream& operator<<(std::ostream& os, const ioVec& v);
 std::ostream& operator<<(std::ostream& os, const InputData& inputs);
 void changeRandomSeed(InputData& inputs);
 void save(const std::vector<float>& data, u32 width, u32 height, std::string_view filename);
+unsigned exportColor(float color);
+std::tuple<float, float, float> xyzToRgb(float x, float y, float z);

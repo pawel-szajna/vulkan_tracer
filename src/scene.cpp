@@ -25,9 +25,7 @@ InputData SceneBuilder::build()
     SPDLOG_INFO("        Scalars: {}/{}", scalarId, scalarsLimit);
     SPDLOG_INFO("        Integers: {}/{}", integerId, integersLimit);
 
-    auto result = inputs;
-    inputs      = InputData{};
-    return result;
+    return inputs;
 }
 
 u32 SceneBuilder::getResolutionWidth() const

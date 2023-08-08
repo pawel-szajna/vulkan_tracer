@@ -20,8 +20,15 @@ ComputeRunner::ComputeRunner(VulkanCompute& vulkan, InputData scene, std::string
     }
 }
 
+void ComputeRunner::abort()
+{
+    running = false;
+}
+
 void ComputeRunner::execute(u32 iterations)
 {
+    running = true;
+
     if (iterations % scene.samplesPerShader > 0)
     {
         throw std::invalid_argument("Requested iterations count is not a multiple of per shader sample count");
@@ -34,7 +41,7 @@ void ComputeRunner::execute(u32 iterations)
     std::vector<float> batchResult{};
     batchResult.resize(scene.renderWidth * scene.renderHeight * 4);
 
-    constexpr static u32 targetTimeMs = 150;
+    constexpr static u32 targetTime = 200'000;
     constexpr static u32 chunkSize = 64;
 
     u32 chunksHorizontal = scene.renderWidth / chunkSize;
@@ -46,7 +53,7 @@ void ComputeRunner::execute(u32 iterations)
     {
         for (u32 j = 0; j < chunksVertical; ++j)
         {
-            chunkProgress[{i, j}] = {iterations, targetTimeMs};
+            chunkProgress[{i, j}] = {iterations, 0};
         }
     }
 
@@ -63,7 +70,7 @@ void ComputeRunner::execute(u32 iterations)
     };
     indicators::show_console_cursor(false);
 
-    while (remaining > 0)
+    while (remaining > 0 and running)
     {
         for (u32 i = 0; i < chunksHorizontal; ++i)
         {
@@ -74,9 +81,13 @@ void ComputeRunner::execute(u32 iterations)
                     continue;
                 }
 
-                u32 samples = std::min(std::max(1u, targetTimeMs / chunkProgress[{i, j}].second), chunkProgress[{i, j}].first);
-                SPDLOG_DEBUG("Rendering chunk {{{}, {}}}. Last time: {} ms, samples: {}, remaining: {}",
-                             i, j, chunkProgress[{i, j}].second, samples, chunkProgress[{i, j}].first);
+                u32 samples = 1;
+                if (chunkProgress[{i, j}].second > 0)
+                {
+                    samples = std::min(std::max(1u, targetTime / chunkProgress[{i, j}].second), chunkProgress[{i, j}].first);
+                }
+                SPDLOG_DEBUG("Rendering chunk {{{}, {}}}. Last average time per sample: {} ms, remaining samples: {}, queued samples: {}, ",
+                             i, j, chunkProgress[{i, j}].second / 1000.f, chunkProgress[{i, j}].first, samples);
 
                 changeRandomSeed(scene);
                 scene.samplesPerShader = samples;
@@ -85,7 +96,7 @@ void ComputeRunner::execute(u32 iterations)
                 scene.weight = invIterations;
 
                 vulkan.upload(scene);
-                u64 execTime = vulkan.execute() / 1000;
+                u64 execTime = vulkan.execute();
 
                 chunkProgress[{i, j}].first -= samples;
                 chunkProgress[{i, j}].second = execTime / samples;
@@ -98,10 +109,10 @@ void ComputeRunner::execute(u32 iterations)
     }
 
     indicators::show_console_cursor(true);
-    vulkan.download(reinterpret_cast<u8*>(data.data()));
 }
 
 std::vector<float> ComputeRunner::results()
 {
+    vulkan.download(reinterpret_cast<u8*>(data.data()));
     return data;
 }

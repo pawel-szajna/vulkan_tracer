@@ -7,8 +7,6 @@
 #include <random>
 #include <spdlog/spdlog.h>
 
-namespace
-{
 unsigned exportColor(float color)
 {
     return static_cast<unsigned>(256 * std::clamp(std::sqrt(color), 0.f, 0.999f));
@@ -41,7 +39,6 @@ std::tuple<float, float, float> xyzToRgb(float x, float y, float z)
     B += overflowR + overflowG;
 
     return {R, G, B};
-}
 }
 
 std::ostream& operator<<(std::ostream& os, const ioVec& v)

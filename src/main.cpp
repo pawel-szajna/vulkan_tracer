@@ -1,11 +1,13 @@
 #include "helpers.hpp"
 #include "io_types.hpp"
+#include "live_view.hpp"
 #include "runner.hpp"
 #include "scene_reader.hpp"
 #include "timers.hpp"
 #include "vulkan_compute.hpp"
 
 #include <memory>
+#include <thread>
 
 #include <argparse/argparse.hpp>
 #include <spdlog/spdlog.h>
@@ -36,6 +38,7 @@ int main(int argc, char** argv)
 
     argparse::ArgumentParser args("vulkan_tracer");
     args.add_argument("files").help("YML file with scene definition").remaining();
+    args.add_argument("--preview").help("enable live preview of the rendered image").default_value(false).implicit_value(true);
     args.add_argument("--list-devices").help("show available devices").default_value(false).implicit_value(true);
     args.add_argument("--device").help("manually specify a device").default_value(-1).scan<'i', int>();
 
@@ -78,6 +81,13 @@ int main(int argc, char** argv)
     }
 
     auto deviceId = args.get<int>("--device");
+    auto preview = args.get<bool>("--preview");
+
+    if (preview and files.size() > 1)
+    {
+        SPDLOG_WARN("Live preview can be enabled only if a single image is rendered");
+        preview = false;
+    }
 
     for (const auto& file : files)
     {
@@ -86,10 +96,29 @@ int main(int argc, char** argv)
         auto width  = scene.getResolutionWidth();
         auto height = scene.getResolutionHeight();
 
+        if (width % 64 != 0 or height % 64 != 0)
+        {
+            SPDLOG_WARN("Image resolution {}x{} is not divisible by 64, reducing to {}x{}",
+                        width, height, width / 64 * 64, height / 64 * 64);
+            width = width / 64 * 64;
+            height = height / 64 * 64;
+            scene.setResolution(width, height);
+        }
+
         VulkanCompute vc{sizeof(InputData), width * height * sizeof(float) * 4, "main.spv", 64, 64, 1, deviceId};
         ComputeRunner runner{vc, scene.build(), file};
 
-        runner.execute(scene.getTargetIterations());
+        std::thread runnerThread([&]() { runner.execute(scene.getTargetIterations()); });
+
+        if (preview)
+        {
+            LiveView{scene, runner}.start();
+        }
+
+        if (runnerThread.joinable())
+        {
+            runnerThread.join();
+        }
 
         save(runner.results(), width, height, fmt::format("{}_output.ppm", file));
     }

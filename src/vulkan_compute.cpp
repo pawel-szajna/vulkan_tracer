@@ -356,8 +356,6 @@ void VulkanCompute::download(u8* outputData)
     auto timer      = Timers::create("Data download");
     auto outputView = static_cast<u8*>(device.mapMemory(outputMemory, 0, outputMemorySize));
     std::copy(outputView, outputView + outputMemorySize, outputData);
-    SPDLOG_DEBUG("Download finished, cleaning memory");
-    std::fill(outputView, outputView + outputMemorySize, 0);
     SPDLOG_DEBUG("Finished");
     device.unmapMemory(outputMemory);
 }
