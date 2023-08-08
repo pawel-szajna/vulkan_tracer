@@ -30,7 +30,7 @@ and hope for the best!
 Usage
 -----
 
-Calling ``./vulkan_tracer scene.yml`` should produce a file called ``output.ppm`` with
+Calling ``./vulkan_tracer -i scene.yml`` should produce a file called ``output.ppm`` with
 the rendered scene.
 
 Compatibility

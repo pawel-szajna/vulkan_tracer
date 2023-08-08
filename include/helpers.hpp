@@ -42,3 +42,4 @@ void changeRandomSeed(InputData& inputs);
 void save(const std::vector<float>& data, u32 width, u32 height, std::string_view filename);
 unsigned exportColor(float color);
 std::tuple<float, float, float> xyzToRgb(float x, float y, float z);
+void setupLogger();

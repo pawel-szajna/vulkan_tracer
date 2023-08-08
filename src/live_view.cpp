@@ -8,7 +8,7 @@
 #include <spdlog/spdlog.h>
 #include <thread>
 
-#define LiveViewWindowConstructor LiveViewWindow(int width, int height)
+#define LiveViewWindowConstructor LiveViewWindow(int width, int height, float scale)
 #define LiveViewWindowUpdate bool update(const std::vector<u32>& pixels)
 
 #if defined(HAS_LIVE_VIEW)
@@ -22,9 +22,9 @@ public:
     LiveViewWindowConstructor
         : width{width}
     {
-        SPDLOG_DEBUG("Creating live view window {}x{}", width, height);
+        SPDLOG_DEBUG("Creating live view window {}x{}", width * scale, height * scale);
         SDL_Init(SDL_INIT_EVERYTHING);
-        window = SDL_CreateWindow("Live preview", 0, 0, width, height, 0);
+        window = SDL_CreateWindow("Live preview", 0, 0, width * scale, height * scale, 0);
         renderer = SDL_CreateRenderer(window, 0, 0);
         texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, width, height);
     }
@@ -83,11 +83,12 @@ public:
 
 #endif
 
-LiveView::LiveView(const SceneBuilder& scene, ComputeRunner& runner)
+LiveView::LiveView(const SceneBuilder& scene, ComputeRunner& runner, float scale)
     : scene{scene}
     , runner{runner}
     , window{std::make_unique<LiveViewWindow>(scene.getResolutionWidth(),
-                                              scene.getResolutionHeight())}
+                                              scene.getResolutionHeight(),
+                                              scale)}
 {}
 
 LiveView::~LiveView()

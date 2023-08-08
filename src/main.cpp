@@ -11,36 +11,20 @@
 
 #include <argparse/argparse.hpp>
 #include <spdlog/spdlog.h>
-#include <spdlog/sinks/basic_file_sink.h>
-#include <spdlog/sinks/stdout_color_sinks.h>
-
-#if defined(__unix__) or defined(__APPLE__)
-#include <unistd.h>
-#else
-#define isatty(...) false
-#endif
 
 int main(int argc, char** argv)
 {
-    if (isatty(fileno(stdout)))
-    {
-        auto fileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("vulkan_tracer.log");
-        auto consoleSink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-        fileSink->set_level(spdlog::level::debug);
-        consoleSink->set_level(spdlog::level::warn);
-        auto logger = std::make_shared<spdlog::logger>("tracer", spdlog::sinks_init_list{fileSink, consoleSink});
-        logger->set_level(spdlog::level::debug);
-        spdlog::set_default_logger(logger);
-    }
+    Timers timers{};
+    setupLogger();
 
     SPDLOG_INFO("GPU Raytracer startup");
-    Timers timers{};
 
     argparse::ArgumentParser args("vulkan_tracer");
-    args.add_argument("files").help("YML file with scene definition").remaining();
-    args.add_argument("--preview").help("enable live preview of the rendered image").default_value(false).implicit_value(true);
-    args.add_argument("--list-devices").help("show available devices").default_value(false).implicit_value(true);
-    args.add_argument("--device").help("manually specify a device").default_value(-1).scan<'i', int>();
+    args.add_argument("-i", "--input").help("YML file with scene definition");
+    args.add_argument("-p", "--preview").help("enable live preview of the rendered image").default_value(false).implicit_value(true);
+    args.add_argument("-s", "--scale").help("scales the output preview window").default_value(1.f).scan<'g', float>();
+    args.add_argument("-l", "--list-devices").help("show available devices").default_value(false).implicit_value(true);
+    args.add_argument("-d", "--device").help("manually specify a device").default_value(-1).scan<'i', int>();
 
     try
     {
@@ -68,13 +52,7 @@ int main(int argc, char** argv)
     {
     #endif
 
-    std::vector<std::string> files;
-    try
-    {
-        files = args.get<std::vector<std::string>>("files");
-        SPDLOG_DEBUG("{} files to process", files.size());
-    }
-    catch (const std::logic_error&)
+    if (not args.present("--input"))
     {
         SPDLOG_WARN("Nothing to do. Call with --help to check usage");
         return 0;
@@ -82,47 +60,39 @@ int main(int argc, char** argv)
 
     auto deviceId = args.get<int>("--device");
     auto preview = args.get<bool>("--preview");
+    auto file = args.get<std::string>("--input");
+    auto scene = SceneReader::read(file);
 
-    if (preview and files.size() > 1)
+    auto width  = scene.getResolutionWidth();
+    auto height = scene.getResolutionHeight();
+
+    if (width % 64 != 0 or height % 64 != 0)
     {
-        SPDLOG_WARN("Live preview can be enabled only if a single image is rendered");
-        preview = false;
+        SPDLOG_WARN("Image resolution {}x{} is not divisible by 64, reducing to {}x{}",
+                    width, height, width / 64 * 64, height / 64 * 64);
+        width = width / 64 * 64;
+        height = height / 64 * 64;
+        scene.setResolution(width, height);
     }
 
-    for (const auto& file : files)
+    VulkanCompute vc{sizeof(InputData), width * height * sizeof(float) * 4, "main.spv", 64, 64, 1, deviceId};
+    ComputeRunner runner{vc, scene.build(), file};
+
+    std::thread runnerThread([&]() { runner.execute(scene.getTargetIterations()); });
+
+    if (preview)
     {
-        auto scene = SceneReader::read(file);
-
-        auto width  = scene.getResolutionWidth();
-        auto height = scene.getResolutionHeight();
-
-        if (width % 64 != 0 or height % 64 != 0)
-        {
-            SPDLOG_WARN("Image resolution {}x{} is not divisible by 64, reducing to {}x{}",
-                        width, height, width / 64 * 64, height / 64 * 64);
-            width = width / 64 * 64;
-            height = height / 64 * 64;
-            scene.setResolution(width, height);
-        }
-
-        VulkanCompute vc{sizeof(InputData), width * height * sizeof(float) * 4, "main.spv", 64, 64, 1, deviceId};
-        ComputeRunner runner{vc, scene.build(), file};
-
-        std::thread runnerThread([&]() { runner.execute(scene.getTargetIterations()); });
-
-        if (preview)
-        {
-            LiveView{scene, runner}.start();
-        }
-
-        if (runnerThread.joinable())
-        {
-            runnerThread.join();
-        }
-
-        auto [results, _] = runner.results();
-        save(results, width, height, fmt::format("{}_output.ppm", file));
+        auto scale = args.get<float>("--scale");
+        LiveView{scene, runner, scale}.start();
     }
+
+    if (runnerThread.joinable())
+    {
+        runnerThread.join();
+    }
+
+    auto [results, _] = runner.results();
+    save(results, width, height, fmt::format("{}_output.ppm", file));
 
     #if not defined(DebugBuild)
     }

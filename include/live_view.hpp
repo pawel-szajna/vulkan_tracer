@@ -10,7 +10,7 @@ class LiveView
 {
 public:
 
-    LiveView(const SceneBuilder& scene, ComputeRunner& runner);
+    LiveView(const SceneBuilder& scene, ComputeRunner& runner, float scale);
     ~LiveView();
 
     void start();

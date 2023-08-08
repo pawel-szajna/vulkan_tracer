@@ -29,11 +29,6 @@ void ComputeRunner::execute(u32 iterations)
 {
     running = true;
 
-    if (iterations % scene.samplesPerShader > 0)
-    {
-        throw std::invalid_argument("Requested iterations count is not a multiple of per shader sample count");
-    }
-
     SPDLOG_INFO("Execution targets {} total iterations, yielding {}M total virtual photons",
                 iterations,
                 (u64)iterations * scene.renderWidth * scene.renderHeight / 1'000'000);
@@ -53,7 +48,7 @@ void ComputeRunner::execute(u32 iterations)
     {
         for (u32 j = 0; j < chunksVertical; ++j)
         {
-            chunkProgress[{i, j}] = {iterations, 0};
+            chunkProgress[{i, j}] = {iterations, targetTime / 4};
         }
     }
 
@@ -70,11 +65,11 @@ void ComputeRunner::execute(u32 iterations)
     };
     indicators::show_console_cursor(false);
 
-    while (remaining > 0 and running)
+    while (remaining > 0)
     {
         for (u32 i = 0; i < chunksHorizontal; ++i)
         {
-            for (u32 j = 0; j < chunksVertical; ++j)
+            for (u32 j = 0; j < chunksVertical and running; ++j)
             {
                 if (chunkProgress[{i, j}].first == 0)
                 {

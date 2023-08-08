@@ -79,7 +79,6 @@ void SceneReaderImpl::readConfiguration()
     auto config = root["Configuration"];
 
     scene.setResolution(config["Resolution"]["Width"].as<u32>(), config["Resolution"]["Height"].as<u32>());
-    scene.setSamplesPerShaderPass(config["SamplesPerShader"].as<u32>());
     scene.setTargetIterations(config["TotalSamples"].as<u32>());
     scene.setReflectionsLimit(config["ReflectionsLimit"].as<u32>());
 }

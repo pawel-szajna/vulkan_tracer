@@ -5,7 +5,10 @@
 #include <cmath>
 #include <fstream>
 #include <random>
+
 #include <spdlog/spdlog.h>
+#include <spdlog/sinks/basic_file_sink.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
 
 unsigned exportColor(float color)
 {
@@ -83,4 +86,15 @@ void save(const std::vector<float>& data, u32 width, u32 height, std::string_vie
                     << exportColor(b) << '\n';
         }
     }
+}
+
+void setupLogger()
+{
+    auto fileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("vulkan_tracer.log");
+    auto consoleSink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+    fileSink->set_level(spdlog::level::debug);
+    consoleSink->set_level(spdlog::level::warn);
+    auto logger = std::make_shared<spdlog::logger>("tracer", spdlog::sinks_init_list{fileSink, consoleSink});
+    logger->set_level(spdlog::level::debug);
+    spdlog::set_default_logger(logger);
 }
