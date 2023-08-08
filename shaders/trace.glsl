@@ -15,6 +15,11 @@ float trace(Ray ray, DataUsage usage)
             return intensity * inputs.background.w * colorIntensity(ray.wavelength, inputs.background.xyz);
         }
 
+        if (collision.material < 0)
+        {
+            return random();
+        }
+
         ReflectionOpt reflection = Scene_reflect(ray, collision);
         float lighting = Scene_shine(ray.wavelength, collision.material);
         intensity *= lighting;

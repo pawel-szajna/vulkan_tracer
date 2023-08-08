@@ -20,7 +20,7 @@ float Prism_distance2D(vec2 a, vec2 b)
 
 bool Prism_between2D(vec2 a, vec2 b, vec2 p)
 {
-    return abs(Prism_distance2D(a, p) + Prism_distance2D(p, b) - Prism_distance2D(a, b)) < 1e-9;
+    return abs(Prism_distance2D(a, p) + Prism_distance2D(p, b) - Prism_distance2D(a, b)) < 1e-5;
 }
 
 PrismWallIntersection Prism_intersectWall(Ray ray, vec2 segment1, vec2 segment2)
@@ -46,7 +46,7 @@ PrismWallIntersection Prism_intersectWall(Ray ray, vec2 segment1, vec2 segment2)
 
     float distance = Prism_distance2D(intersectionPoint, ray1);
 
-    if (abs(distance) < 1e-6)
+    if (abs(distance) < 1e-4)
     {
         return NoPrismWallIntersection;
     }
@@ -69,66 +69,102 @@ CollisionOpt Prism_collisionFromOutside(Ray ray,
                                         PrismWallIntersection xsect2,
                                         float min, float max)
 {
-//    if (!(xsect1.valid && xsect2.valid))
-//    {
-//        return NoCollision;
-//    }
+    if (!(xsect1.valid && xsect2.valid))
+    {
+        return NoCollision;
+    }
 
     vec3 hit = Ray_at(ray, xsect1.position);
 
-//    if (hit.y > top)
-//    {
-//        if (ray.direction.y > 0)
-//        {
-//            return NoCollision;
-//        }
-//
-//        xsect1.position = (top - ray.origin.y) / ray.direction.y;
-//
-//        if (xsect2.position < xsect1.position)
-//        {
-//            return NoCollision;
-//        }
-//
-//        xsect1.normal = vec3(0, 1, 0);
-//    }
-//
-//    if (hit.y < bottom)
-//    {
-//        if (ray.direction.y < 0)
-//        {
-//            return NoCollision;
-//        }
-//
-//        xsect1.position = (bottom - ray.origin.y) / ray.direction.y;
-//
-//        if (xsect2.position < xsect1.position)
-//        {
-//            return NoCollision;
-//        }
-//
-//        xsect1.normal = vec3(0, -1, 0);
-//    }
-//
+    if (hit.y > top)
+    {
+        if (ray.direction.y > 0)
+        {
+            return NoCollision;
+        }
+
+        xsect1.position = (top - ray.origin.y) / ray.direction.y;
+
+        if (xsect2.position < xsect1.position)
+        {
+            return NoCollision;
+        }
+
+        xsect1.normal = vec3(0, 1, 0);
+    }
+
+    if (hit.y < bottom)
+    {
+        if (ray.direction.y < 0)
+        {
+            return NoCollision;
+        }
+
+        xsect1.position = (bottom - ray.origin.y) / ray.direction.y;
+
+        if (xsect2.position < xsect1.position)
+        {
+            return NoCollision;
+        }
+
+        xsect1.normal = vec3(0, -1, 0);
+    }
+
     if (xsect1.position < min || xsect1.position > max)
     {
         return NoCollision;
     }
 
     CollisionOpt collision =
-        Collision(ray.direction, xsect1.position, Ray_at(ray, xsect1.position), xsect1.normal, material);
+        Collision(ray.direction,
+                  xsect1.position,
+                  Ray_at(ray, xsect1.position),
+                  xsect1.normal,
+                  material);
 
-//    if (collision.fromInside)
-//    {
-//        return NoCollision;
-//    }
+    if (collision.fromInside)
+    {
+        return NoCollision;
+    }
 
     return collision;
 }
 
-CollisionOpt Prism_collisionFromInside()
+CollisionOpt Prism_collisionFromInside(Ray ray,
+                                       float top, float bottom,
+                                       int material,
+                                       PrismWallIntersection xsect,
+                                       float min, float max)
 {
-    return NoCollision;
+    if (!xsect.valid)
+    {
+        return NoCollision;
+    }
+
+    vec3 hit = Ray_at(ray, xsect.position);
+
+    if (hit.y > top)
+    {
+        xsect.position = (top - ray.origin.y) / ray.direction.y;
+        xsect.normal = vec3(0, -1, 0);
+    }
+
+    if (hit.y < bottom)
+    {
+        xsect.position = (bottom - ray.origin.y) / ray.direction.y;
+        xsect.normal = vec3(0, 1, 0);
+    }
+
+    if (xsect.position < min || xsect.position > max)
+    {
+        return NoCollision;
+    }
+
+    return Collision(ray.direction,
+                     xsect.position,
+                     Ray_at(ray, xsect.position),
+                     xsect.normal,
+                     material);
 }
 
 CollisionOpt Prism_hit(float top, float bottom,
@@ -145,6 +181,8 @@ CollisionOpt Prism_hit(float top, float bottom,
 
     PrismWallIntersection xsect1 = NoPrismWallIntersection;
     PrismWallIntersection xsect2 = NoPrismWallIntersection;
+
+    PrismWallIntersection xsectFront = NoPrismWallIntersection;
 
     uint validIntersections = 0;
 
@@ -171,6 +209,11 @@ CollisionOpt Prism_hit(float top, float bottom,
         {
             xsect2 = current;
         }
+
+        if (current.distance < xsectFront.distance && current.position >= 0)
+        {
+            xsectFront = current;
+        }
     }
 
     if (validIntersections == 0)
@@ -179,6 +222,6 @@ CollisionOpt Prism_hit(float top, float bottom,
     }
 
     return validIntersections % 2 == 1
-         ? Prism_collisionFromInside()
+         ? Prism_collisionFromInside(ray, top, bottom, material, xsectFront, min, max)
          : Prism_collisionFromOutside(ray, top, bottom, material, xsect1, xsect2, min, max);
 }

@@ -1,8 +1,8 @@
 Configuration:
   Resolution:
-    Width: 576
-    Height: 320
-  TotalSamples: 150
+    Width: 1280
+    Height: 720
+  TotalSamples: 500
   ReflectionsLimit: 32
 Background:
   Color: [440, 760, 40]
@@ -70,7 +70,7 @@ Shapes:
       Radius: 0.1
       Material: GreenLight
   - Sphere:
-      Center: [0.65, -0.3, -1.7]
+      Center: [0.7, -0.3, -1.7]
       Radius: 0.1
       Material: BlueLight
   - Sphere:
@@ -78,21 +78,21 @@ Shapes:
       Radius: 0.15
       Material: Glass
   - Prism:
-      Top: 0.9
+      Top: 0.25
       Bottom: -0.4
       Vertices: [
         [-0.4, 0, -2.3],
         [-0.9, 0, -1.8],
         [-0.2, 0, -1.6]
       ]
-      Material: Ball
+      Material: Glass
   - Prism:
-      Top: -0.2
+      Top: -0.15
       Bottom: -0.4
       Vertices: [
-        [0.5, 0, -2],
-        [1, 0, -1.5],
-        [1.5, 0, -2],
-        [1, 0, -2.5]
+        [0.25, 0, -2],
+        [0.45, 0, -1.8],
+        [0.65, 0, -2],
+        [0.45, 0, -2.2]
       ]
       Material: Ball

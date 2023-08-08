@@ -127,13 +127,14 @@ void SceneBuilder::addShapeCloud(vec3 center, float radius, float intensity, i32
 
 void SceneBuilder::addShapePrism(float top, float bottom, std::vector<vec3> vertices, i32 material)
 {
-    addScalar(top);
-    addScalar(bottom);
-    addInteger(material);
     for (const auto& vertex : vertices)
     {
         addVector(vertex);
     }
+    addScalar(top);
+    addScalar(bottom);
+    addInteger(vertices.size());
+    addInteger(material);
     addShape(ShapeType::Prism);
 }
 
