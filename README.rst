@@ -17,6 +17,7 @@ Dependencies
 * C++ Libraries:
     * **argparse** – argument parsing
     * **indicators** – progress display (included single-header)
+    * **SDL2** – live preview (if ``LIVE_VIEW`` CMake flag is on)
     * **spdlog** – application logging
     * **yaml-cpp** – configuration
 

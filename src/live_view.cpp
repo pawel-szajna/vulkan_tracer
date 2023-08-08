@@ -100,7 +100,7 @@ void LiveView::start()
     std::vector<u32> pixels;
     auto width = scene.getResolutionWidth();
     auto height = scene.getResolutionHeight();
-    pixels.reserve(width * height);
+    pixels.resize(width * height);
 
     do
     {
@@ -125,7 +125,7 @@ void LiveView::start()
             }
         }
 
-        std::this_thread::sleep_for(std::chrono::milliseconds{200});
+        std::this_thread::sleep_for(std::chrono::milliseconds{250});
     }
     while (window->update(pixels));
     runner.abort();
