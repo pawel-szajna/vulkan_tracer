@@ -15,7 +15,7 @@ struct vec4 : vec3
 {
     vec4(float x, float y, float z, float w);
     vec4(vec3 v, float w);
-    float w;
+    float w, xyz;
 };
 
 vec2 operator+(vec2, vec2);

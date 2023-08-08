@@ -3,6 +3,7 @@
 #include "../types/collision.glsl"
 #include "../types/ray.glsl"
 #include "../utils/random.glsl"
+#include "../utils/vector_ops.glsl"
 
 const float Glass_refractionFactorA = 1.33442e7;
 const float Glass_refractionFactorB = -3102.98;
