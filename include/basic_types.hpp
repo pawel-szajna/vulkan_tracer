@@ -29,8 +29,6 @@ struct vec3
     float y;
     float z;
 
-    operator ioVec() const
-    {
-        return ioVec{x, y, z, 0};
-    }
+    vec3(float x, float y, float z) : x{x}, y{y}, z{z} {}
+    operator ioVec() const { return ioVec{x, y, z, 0}; }
 };

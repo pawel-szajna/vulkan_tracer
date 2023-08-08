@@ -1,9 +1,14 @@
 Configuration:
   Resolution:
-    Width: 1280
-    Height: 720
-  TotalSamples: 500
+    Width: 1920
+    Height: 1080
+  TotalSamples: 4000
   ReflectionsLimit: 32
+Camera:
+  Origin: [0.45, 1.0, 0.5]
+  Target: [-0.15, 0, -1.85]
+  Up: [0, 1, 0]
+  FieldOfVision: 64
 Background:
   Color: [440, 760, 40]
   Intensity: 0.02
@@ -49,8 +54,8 @@ Shapes:
       Radius: 0.5
       Material: Ball
   - Sphere:
-      Center: [1.5, 0.6, -4]
-      Radius: 0.25
+      Center: [-1.35, -0.05, -2.25]
+      Radius: 0.35
       Material: Mirror
   - Cloud:
       Center: [0, 1.1, -3]
@@ -58,27 +63,39 @@ Shapes:
       Density: 1.5e-2
       Material: Fog
   - Sphere:
-      Center: [-0.205, 0.45, -4]
+      Center: [-0.35, -0.05, -3.9]
       Radius: 0.475
       Material: WhiteLight
   - Sphere:
-      Center: [-0.7, -0.3, -1.75]
+      Center: [-0.9, -0.3, -1.45]
       Radius: 0.1
       Material: RedLight
   - Sphere:
-      Center: [0.45, -0.3, -3]
+      Center: [0.68, -0.3, -2.75]
       Radius: 0.1
       Material: GreenLight
   - Sphere:
-      Center: [0.7, -0.3, -1.7]
+      Center: [0.3, -0.3, -1.85]
       Radius: 0.1
       Material: BlueLight
   - Sphere:
-      Center: [-0.41, -0.25, -1.55]
+      Center: [-0.41, -0.25, -1.3]
       Radius: 0.15
       Material: Glass
+  - Sphere:
+      Center: [0.4, -0.35, -2.6]
+      Radius: 0.05
+      Material: Glass
+  - Sphere:
+      Center: [0.93, -0.35, -2.3]
+      Radius: 0.05
+      Material: Glass
+  - Sphere:
+      Center: [ -0.8, -0.35, -1.35 ]
+      Radius: 0.05
+      Material: Glass
   - Prism:
-      Top: 0.25
+      Top: 0.35
       Bottom: -0.4
       Vertices: [
         [-0.4, 0, -2.3],
@@ -87,12 +104,12 @@ Shapes:
       ]
       Material: Glass
   - Prism:
-      Top: -0.15
+      Top: -0.1
       Bottom: -0.4
       Vertices: [
-        [0.25, 0, -2],
-        [0.45, 0, -1.8],
-        [0.65, 0, -2],
-        [0.45, 0, -2.2]
+        [0.45, 0, -2],
+        [0.65, 0, -1.8],
+        [0.85, 0, -2],
+        [0.65, 0, -2.2]
       ]
       Material: Ball

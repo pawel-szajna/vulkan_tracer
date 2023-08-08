@@ -46,6 +46,10 @@ vec2 operator-(vec2);
 vec3 operator-(vec3);
 vec4 operator-(vec4);
 
+vec2 operator+=(vec2, vec2);
+vec3 operator+=(vec3, vec3);
+vec4 operator+=(vec4, vec4);
+
 vec2 normalize(vec2);
 vec3 normalize(vec3);
 vec4 normalize(vec4);
@@ -57,6 +61,9 @@ float length(vec4);
 float dot(vec2, vec2);
 float dot(vec3, vec3);
 float dot(vec4, vec4);
+vec2 cross(vec2, vec2);
+vec3 cross(vec3, vec3);
+vec4 cross(vec4, vec4);
 float exp(float);
 float abs(float);
 float sqrt(float);
@@ -64,8 +71,12 @@ float pow(float, float);
 float min(float, float);
 float max(float, float);
 float log(float);
+float tan(float);
+float radians(float);
 
 using uint = unsigned int;
+
+vec3 gl_GlobalInvocationID;
 
 InputData inputs;
 struct OutputData { vec4* pixels; } results;

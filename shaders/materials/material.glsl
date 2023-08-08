@@ -35,11 +35,11 @@ struct ReflectionOpt
     float intensity;
 };
 
-const ReflectionOpt InvalidReflection = ReflectionOpt(false, InvalidRay, 0);
+const ReflectionOpt InvalidReflection = { false, InvalidRay, 0 };
 
 DataUsage materialsDataUsage(uint limit)
 {
-    DataUsage results = DataUsage(0, 0, 0);
+    DataUsage results = { 0, 0, 0 };
 
     for (uint i = 0; i < limit; ++i)
     {

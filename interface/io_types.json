@@ -17,6 +17,11 @@
                 { "type": "uint", "name": "reflectionsLimit" },
                 { "type": "float", "name": "weight" },
 
+                { "type": "vec4", "name": "cameraOrigin" },
+                { "type": "vec4", "name": "cameraTarget" },
+                { "type": "vec4", "name": "cameraUp" },
+                { "type": "float", "name": "cameraFov" },
+
                 { "type": "uint", "name": "renderWidth" },
                 { "type": "uint", "name": "renderHeight" },
 

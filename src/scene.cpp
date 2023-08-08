@@ -6,6 +6,16 @@
 #include "constants.hpp"
 #include "helpers.hpp"
 
+namespace
+{
+void assignVector(float* target, vec3 source)
+{
+    target[0] = source.x;
+    target[1] = source.y;
+    target[2] = source.z;
+}
+}
+
 SceneBuilder::SceneBuilder()
 {
     changeRandomSeed(inputs);
@@ -46,10 +56,16 @@ void SceneBuilder::setResolution(u32 width, u32 height)
 
 void SceneBuilder::setBackground(vec3 color, float intensity)
 {
-    inputs.background[0] = color.x;
-    inputs.background[1] = color.y;
-    inputs.background[2] = color.z;
+    assignVector(inputs.background, color);
     inputs.background[3] = intensity;
+}
+
+void SceneBuilder::setCamera(vec3 origin, vec3 target, vec3 up, float fov)
+{
+    assignVector(inputs.cameraOrigin, origin);
+    assignVector(inputs.cameraTarget, target);
+    assignVector(inputs.cameraUp, up);
+    inputs.cameraFov = fov;
 }
 
 u32 SceneBuilder::getTargetIterations() const

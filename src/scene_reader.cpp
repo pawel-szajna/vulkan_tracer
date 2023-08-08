@@ -25,6 +25,7 @@ private:
 
     void readConfiguration();
     void readBackground();
+    void readCamera();
 
     void readMaterials();
     void readDiffuse(i32 id, const YAML::Node& diffuse);
@@ -57,6 +58,7 @@ SceneBuilder SceneReaderImpl::operator()()
     try
     {
         readConfiguration();
+        readCamera();
         readBackground();
         readMaterials();
         readShapes();
@@ -89,6 +91,16 @@ void SceneReaderImpl::readBackground()
 
     scene.setBackground(readVector(background["Color"]),
                         background["Intensity"].as<float>());
+}
+
+void SceneReaderImpl::readCamera()
+{
+    auto camera = root["Camera"];
+
+    scene.setCamera(readVector(camera["Origin"]),
+                    readVector(camera["Target"]),
+                    readVector(camera["Up"]),
+                    camera["FieldOfVision"].as<float>());
 }
 
 i32 SceneReaderImpl::readMaterial(const YAML::Node& source)

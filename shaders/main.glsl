@@ -20,20 +20,29 @@ void main()
     initializeRng(x, y);
 
     uint samples = inputs.samplesPerShader;
-
-    vec3 screenStart =
-        vec3(-0.5, -0.5 * (float(inputs.renderHeight) / float(inputs.renderWidth)), -1.0);
     DataUsage usage = materialsDataUsage(inputs.materialsCount);
+
+    float height = tan(0.5 * radians(inputs.renderHeight * inputs.cameraFov / inputs.renderHeight));
+    float width = height * inputs.renderWidth / inputs.renderHeight;
+
+    vec3 camW = normalize(inputs.cameraOrigin.xyz - inputs.cameraTarget.xyz);
+    vec3 camU = normalize(cross(inputs.cameraUp.xyz, camW));
+    vec3 camV = cross(camW, camU);
+
+    vec3 horizontal = camU * width;
+    vec3 vertical = camV * height;
+
+    vec3 screenStart = inputs.cameraOrigin.xyz - (0.5 * horizontal) - (0.5 * vertical) - camW;
 
     vec3 pixel = vec3(0, 0, 0);
 
     for (uint i = 0; i < samples; ++i)
     {
+        float sceneX = float(x + random()) / inputs.renderWidth;
+        float sceneY = float(y + random()) / inputs.renderHeight;
         Ray ray = {
-            vec3(0.0, 0.0, 0.0),
-            screenStart + vec3(float(x + random()) / inputs.renderWidth,
-                               float(y + random()) / inputs.renderWidth,
-                               0.0),
+            inputs.cameraOrigin.xyz,
+            screenStart + horizontal * sceneX + vertical * sceneY - inputs.cameraOrigin.xyz,
             random(380, 780)
         };
 
