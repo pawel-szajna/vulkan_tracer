@@ -1,3 +1,6 @@
+#pragma once
+#include "../glsl_builtin.h"
+
 struct CollisionOpt
 {
     bool valid;

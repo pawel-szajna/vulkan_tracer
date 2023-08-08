@@ -1,3 +1,6 @@
+#pragma once
+#include "../glsl_builtin.h"
+
 float cie1931(float wavelength, float mi, float sigma1inv, float sigma2inv)
 {
     if (wavelength < mi)

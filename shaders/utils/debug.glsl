@@ -1,3 +1,7 @@
+#pragma once
+#include "../utils/random.glsl"
+#include "../glsl_builtin.h"
+
 const uint debugScale = 5;
 
 void debug(uint x, uint y)

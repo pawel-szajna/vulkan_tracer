@@ -1,3 +1,6 @@
+#pragma once
+#include "../types/ray.glsl"
+
 const uint Diffuse_usageVectors = 1;
 const uint Diffuse_usageScalars = 0;
 const uint Diffuse_usageIntegers = 0;

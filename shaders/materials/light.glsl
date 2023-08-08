@@ -1,4 +1,8 @@
-#include materials/material
+#pragma once
+#include "../materials/material.glsl"
+#include "../types/collision.glsl"
+#include "../types/ray.glsl"
+#include "../utils/random.glsl"
 
 float Light_shine(float wavelength, int material)
 {

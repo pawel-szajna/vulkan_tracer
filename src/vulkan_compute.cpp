@@ -158,17 +158,17 @@ void VulkanCompute::listDevices()
 
     u32 id{};
 
-    fmt::println("Available devices:");
+    fmt::print("Available devices:\n");
     auto devices = instance.enumeratePhysicalDevices();
     for (const auto& dev : devices)
     {
         auto properties = dev.getProperties();
-        fmt::println("    {}: {} - {}, API version {}.{}",
-                     id++,
-                     vk::to_string(properties.deviceType),
-                     std::string_view(properties.deviceName),
-                     VK_VERSION_MAJOR(properties.apiVersion),
-                     VK_VERSION_MINOR(properties.apiVersion));
+        fmt::print("    {}: {} - {}, API version {}.{}\n",
+                   id++,
+                   vk::to_string(properties.deviceType),
+                   std::string_view(properties.deviceName),
+                   VK_VERSION_MAJOR(properties.apiVersion),
+                   VK_VERSION_MINOR(properties.apiVersion));
     }
 
     instance.destroy();

@@ -1,3 +1,7 @@
+#pragma once
+#include "../types/collision.glsl"
+#include "../types/ray.glsl"
+
 CollisionOpt Sphere_hit(vec3 sphereCenter, float sphereRadius, int sphereMaterial,
                         Ray ray, float min, float max)
 {

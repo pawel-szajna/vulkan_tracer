@@ -1,3 +1,7 @@
+#pragma once
+#include "../types/collision.glsl"
+#include "../types/ray.glsl"
+
 struct PrismWallIntersection
 {
     bool valid;

@@ -1,3 +1,8 @@
+#pragma once
+#include "types/ray.glsl"
+#include "materials/material.glsl"
+#include "glsl_builtin.h"
+
 ReflectionOpt Scene_reflect(Ray ray, CollisionOpt collision)
 {
     switch (inputs.materials[collision.material])

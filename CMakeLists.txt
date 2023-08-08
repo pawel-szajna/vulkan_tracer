@@ -57,6 +57,26 @@ add_custom_target(
         interfaces
 )
 
+add_library(
+    shaders_dummy
+    STATIC
+        ${GLSL_FILES}
+)
+
+set_target_properties(
+    shaders_dummy
+    PROPERTIES
+        EXCLUDE_FROM_ALL TRUE
+        LINKER_LANGUAGE CXX
+)
+
+target_include_directories(
+    shaders_dummy
+    PRIVATE
+        shaders
+        ${CMAKE_BINARY_DIR}/generated
+)
+
 file(GLOB INTERFACE_DEFINITIONS CONFIGURE_DEPENDS "${CMAKE_SOURCE_DIR}/interface/*.json")
 foreach(INTERFACE_DEFINITION ${INTERFACE_DEFINITIONS})
     get_filename_component(FILE_NAME ${INTERFACE_DEFINITION} NAME_WE)

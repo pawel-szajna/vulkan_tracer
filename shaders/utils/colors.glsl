@@ -1,3 +1,6 @@
+#pragma once
+#include "../glsl_builtin.h"
+
 float colorIntensity(float wavelength, vec3 spectralRange)
 {
     if (wavelength >= spectralRange.x && wavelength <= spectralRange.y)

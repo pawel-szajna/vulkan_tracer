@@ -1,3 +1,8 @@
+#pragma once
+#include "types/ray.glsl"
+#include "types/collision.glsl"
+#include "materials/material.glsl"
+
 float trace(Ray ray, DataUsage usage)
 {
     float intensity = 1.0;

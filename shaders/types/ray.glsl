@@ -1,3 +1,6 @@
+#pragma once
+#include "../glsl_builtin.h"
+
 struct Ray
 {
     vec3 origin;

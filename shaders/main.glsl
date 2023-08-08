@@ -1,30 +1,32 @@
 #version 430
 
-#include generated constants
-#include generated io_types
+#include generated constants.glsl
+#include generated io_types.glsl
 
-#include utils/random
-#include utils/colors
-#include utils/vector_ops
+#include "utils/random.glsl"
+#include "utils/colors.glsl"
+#include "utils/vector_ops.glsl"
 
-#include types/ray
-#include types/collision
+#include "types/ray.glsl"
+#include "types/collision.glsl"
 
-#include shapes/prism
-#include shapes/sphere
-#include shapes/cloud
+#include "shapes/prism.glsl"
+#include "shapes/sphere.glsl"
+#include "shapes/cloud.glsl"
 
-#include materials/diffuse
-#include materials/glass
-#include materials/light
-#include materials/fog
-#include materials/mirror
+#include "materials/diffuse.glsl"
+#include "materials/glass.glsl"
+#include "materials/light.glsl"
+#include "materials/fog.glsl"
+#include "materials/mirror.glsl"
 
-#include scene
-#include trace
+#include "scene.glsl"
+#include "trace.glsl"
 
-#include utils/cie1931
-#include utils/debug
+#include "utils/cie1931.glsl"
+#include "utils/debug.glsl"
+
+#include "glsl_builtin.h"
 
 void main()
 {

@@ -1,3 +1,6 @@
+#pragma once
+#include "../glsl_builtin.h"
+
 uint randomInt()
 {
     uint state = inputs.randomSeed;
