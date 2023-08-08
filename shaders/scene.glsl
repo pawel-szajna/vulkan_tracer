@@ -1,6 +1,18 @@
 #pragma once
+
 #include "types/ray.glsl"
-#include "materials/material.glsl"
+#include "types/collision.glsl"
+
+#include "materials/diffuse.glsl"
+#include "materials/fog.glsl"
+#include "materials/glass.glsl"
+#include "materials/light.glsl"
+#include "materials/mirror.glsl"
+
+#include "shapes/prism.glsl"
+#include "shapes/sphere.glsl"
+#include "shapes/cloud.glsl"
+
 #include "glsl_builtin.h"
 
 ReflectionOpt Scene_reflect(Ray ray, CollisionOpt collision)

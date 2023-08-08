@@ -50,6 +50,10 @@ vec2 normalize(vec2);
 vec3 normalize(vec3);
 vec4 normalize(vec4);
 
+float length(vec2);
+float length(vec3);
+float length(vec4);
+
 float dot(vec2, vec2);
 float dot(vec3, vec3);
 float dot(vec4, vec4);
@@ -59,6 +63,7 @@ float sqrt(float);
 float pow(float, float);
 float min(float, float);
 float max(float, float);
+float log(float);
 
 using uint = unsigned int;
 

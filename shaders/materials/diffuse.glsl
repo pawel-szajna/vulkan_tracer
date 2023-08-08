@@ -3,6 +3,7 @@
 #include "../types/collision.glsl"
 #include "../types/ray.glsl"
 #include "../utils/random.glsl"
+#include "../utils/colors.glsl"
 
 ReflectionOpt Diffuse_reflect(Ray ray, CollisionOpt collision)
 {

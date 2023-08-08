@@ -2,6 +2,7 @@
 #include "../types/collision.glsl"
 #include "../types/ray.glsl"
 #include "../utils/random.glsl"
+#include "../shapes/sphere.glsl"
 
 CollisionOpt Cloud_hit(vec3 center, float radius,
                        float density,

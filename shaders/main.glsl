@@ -3,26 +3,11 @@
 #include generated constants.glsl
 #include generated io_types.glsl
 
-#include "utils/random.glsl"
-#include "utils/colors.glsl"
-#include "utils/vector_ops.glsl"
-
-#include "types/ray.glsl"
-#include "types/collision.glsl"
-
-#include "shapes/prism.glsl"
-#include "shapes/sphere.glsl"
-#include "shapes/cloud.glsl"
-
-#include "materials/diffuse.glsl"
-#include "materials/glass.glsl"
-#include "materials/light.glsl"
-#include "materials/fog.glsl"
-#include "materials/mirror.glsl"
-
 #include "scene.glsl"
 #include "trace.glsl"
 
+#include "utils/random.glsl"
+#include "utils/colors.glsl"
 #include "utils/cie1931.glsl"
 #include "utils/debug.glsl"
 
