@@ -7,10 +7,11 @@
 #include <stdexcept>
 #include <spdlog/spdlog.h>
 
-ComputeRunner::ComputeRunner(VulkanCompute& vulkan, InputData scene, std::string_view name)
+ComputeRunner::ComputeRunner(VulkanCompute& vulkan, InputData scene, std::string_view name, i32 timeTarget)
     : vulkan{vulkan}
     , scene{scene}
     , name{name}
+    , timeTarget{timeTarget}
 {
     data.resize(scene.renderWidth * scene.renderHeight * 4);
     auto slash = name.rfind('/');
@@ -36,8 +37,8 @@ void ComputeRunner::execute(u32 iterations)
     std::vector<float> batchResult{};
     batchResult.resize(scene.renderWidth * scene.renderHeight * 4);
 
-    constexpr static u32 targetTime = 200'000;
     constexpr static u32 chunkSize = 64;
+    auto targetTime = timeTarget * 1000;
 
     u32 chunksHorizontal = scene.renderWidth / chunkSize;
     u32 chunksVertical = scene.renderHeight / chunkSize;

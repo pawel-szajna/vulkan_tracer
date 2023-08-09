@@ -25,6 +25,7 @@ int main(int argc, char** argv)
     args.add_argument("-s", "--scale").help("scales the output preview window").default_value(1.f).scan<'g', float>();
     args.add_argument("-l", "--list-devices").help("show available devices").default_value(false).implicit_value(true);
     args.add_argument("-d", "--device").help("manually specify a device").default_value(-1).scan<'i', int>();
+    args.add_argument("-t", "--time").help("aim for a given execution time per scheduled task [ms]").default_value(150).scan<'i', int>();
 
     try
     {
@@ -58,6 +59,7 @@ int main(int argc, char** argv)
         return 0;
     }
 
+    auto schedulerTimeTarget = args.get<int>("--time");
     auto deviceId = args.get<int>("--device");
     auto preview = args.get<bool>("--preview");
     auto file = args.get<std::string>("--input");
@@ -76,7 +78,7 @@ int main(int argc, char** argv)
     }
 
     VulkanCompute vc{sizeof(InputData), width * height * sizeof(float) * 4, "main.spv", 64, 64, 1, deviceId};
-    ComputeRunner runner{vc, scene.build(), file};
+    ComputeRunner runner{vc, scene.build(), file, schedulerTimeTarget};
 
     std::thread runnerThread([&]() { runner.execute(scene.getTargetIterations()); });
 
