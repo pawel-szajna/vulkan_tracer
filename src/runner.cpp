@@ -107,8 +107,8 @@ void ComputeRunner::execute(u32 iterations)
     indicators::show_console_cursor(true);
 }
 
-std::pair<std::vector<float>, ComputeRunner::ChunkProgressMap*> ComputeRunner::results()
+std::pair<std::vector<float>*, ComputeRunner::ChunkProgressMap*> ComputeRunner::results()
 {
     vulkan.download(reinterpret_cast<u8*>(data.data()));
-    return std::make_pair(data, &chunkProgress);
+    return std::make_pair(&data, &chunkProgress);
 }

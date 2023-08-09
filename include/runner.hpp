@@ -18,7 +18,7 @@ public:
     ComputeRunner(VulkanCompute& vulkan, InputData scene, std::string_view name, i32 timeTarget);
     void execute(u32 iterations);
     void abort();
-    std::pair<std::vector<float>, ComputeRunner::ChunkProgressMap*> results();
+    std::pair<std::vector<float>*, ComputeRunner::ChunkProgressMap*> results();
 
 private:
 

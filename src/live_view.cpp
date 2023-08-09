@@ -115,9 +115,9 @@ void LiveView::start()
                 auto currentChunkIterations = chunkProgress->operator[]({segmentX, segmentY}).first;
                 auto chunkDoneIterations = scene.getTargetIterations() - currentChunkIterations + 1;
                 float chunkWeight = float(scene.getTargetIterations()) / float(chunkDoneIterations);
-                auto [r, g, b] = xyzToRgb(chunkWeight * data[(x + y * width) * 4],
-                                          chunkWeight * data[(x + y * width) * 4 + 1],
-                                          chunkWeight * data[(x + y * width) * 4 + 2]);
+                auto [r, g, b] = xyzToRgb(chunkWeight * data->operator[]((x + y * width) * 4),
+                                          chunkWeight * data->operator[]((x + y * width) * 4 + 1),
+                                          chunkWeight * data->operator[]((x + y * width) * 4 + 2));
                 pixels[x + (height - y - 1) * width]
                     = exportColor(r) << 24
                     | exportColor(g) << 16

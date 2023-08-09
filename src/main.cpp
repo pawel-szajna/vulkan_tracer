@@ -94,7 +94,7 @@ int main(int argc, char** argv)
     }
 
     auto [results, _] = runner.results();
-    save(results, width, height, fmt::format("{}_output.ppm", file));
+    save(*results, width, height, fmt::format("{}_output.ppm", file));
 
     #if not defined(DebugBuild)
     }
