@@ -1,5 +1,5 @@
 #include <io_types.hpp>
-#include <preview/live_view.hpp>
+#include <preview/Preview.hpp>
 #include <runner/ComputeRunner.hpp>
 #include <runner/VulkanCompute.hpp>
 #include <scene/scene_reader.hpp>
@@ -12,6 +12,8 @@
 #include <argparse/argparse.hpp>
 #include <spdlog/spdlog.h>
 
+namespace vrt
+{
 int main(int argc, char** argv)
 {
     Timers timers{};
@@ -85,7 +87,7 @@ int main(int argc, char** argv)
     if (preview)
     {
         auto scale = args.get<float>("--scale");
-        LiveView{scene, runner, scale}.start();
+        preview::Preview{scene, runner, scale}.start();
     }
 
     if (runnerThread.joinable())
@@ -106,4 +108,10 @@ int main(int argc, char** argv)
     #endif
 
     return 0;
+}
+}
+
+int main(int argc, char** argv)
+{
+    return vrt::main(argc, argv);
 }

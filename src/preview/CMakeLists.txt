@@ -1,7 +1,8 @@
 add_library(
     vulkan_tracer_preview
     STATIC
-        src/live_view.cpp
+        src/Preview.cpp
+        src/Window.cpp
 )
 
 add_library(
