@@ -2,11 +2,14 @@
 
 #include "VulkanCompute.hpp"
 
+#include <postprocessing/Executor.hpp>
+#include <postprocessing/Variance.hpp>
 #include <utils/Helpers.hpp>
 
 #include <indicators/indicators.hpp>
 #include <mutex>
 #include <numeric>
+#include <optional>
 #include <spdlog/spdlog.h>
 
 namespace
@@ -16,11 +19,16 @@ std::mutex mutex{};
 
 namespace vrt::runner
 {
-ComputeRunner::ComputeRunner(VulkanCompute& vulkan, InputData scene, std::string_view name, i32 timeTarget)
+ComputeRunner::ComputeRunner(VulkanCompute& vulkan,
+                             InputData scene,
+                             std::string_view name,
+                             i32 timeTarget,
+                             bool showProgress)
     : vulkan{vulkan}
     , scene{scene}
     , name{name}
     , timeTarget{timeTarget}
+    , showProgress{showProgress}
 {
     data.resize(scene.renderWidth * scene.renderHeight * 4);
     auto slash = name.rfind('/');
@@ -83,13 +91,17 @@ void ComputeRunner::execute(u32 iterations)
 
     float invIterations = 1.f / float(iterations);
 
-    indicators::BlockProgressBar progressBar{
-        indicators::option::BarWidth{40},
-        indicators::option::PrefixText{fmt::format("Rendering {} ", name)},
-        indicators::option::ShowElapsedTime{true},
-        indicators::option::ShowRemainingTime{true}
-    };
-    indicators::show_console_cursor(false);
+    std::optional<indicators::BlockProgressBar> progressBar{};
+    if (showProgress)
+    {
+        progressBar.emplace(indicators::option::BarWidth{40},
+                            indicators::option::PrefixText{fmt::format("Rendering {} ", name)},
+                            indicators::option::ShowElapsedTime{true},
+                            indicators::option::ShowRemainingTime{true});
+        indicators::show_console_cursor(false);
+    }
+
+    postprocessing::Executor postprocess{};
 
     while (remaining > 0 and running)
     {
@@ -136,7 +148,10 @@ void ComputeRunner::execute(u32 iterations)
             chunk.timePerSample = execTime / samples;
             remaining -= samples;
 
-            progressBar.set_progress(100.f * (total - remaining) / total);
+            if (showProgress)
+            {
+                progressBar->set_progress(100.f * (total - remaining) / total);
+            }
         }
     }
 
@@ -146,7 +161,10 @@ void ComputeRunner::execute(u32 iterations)
         doneCallbacks.pop();
     }
 
-    indicators::show_console_cursor(true);
+    if (showProgress)
+    {
+        indicators::show_console_cursor(true);
+    }
 
     running = false;
 }

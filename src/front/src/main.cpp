@@ -1,4 +1,5 @@
 #include <io_types.hpp>
+#include <postprocessing/Executor.hpp>
 #include <preview/Preview.hpp>
 #include <runner/ComputeRunner.hpp>
 #include <runner/VulkanCompute.hpp>
@@ -17,10 +18,8 @@ namespace vrt
 int main(int argc, char** argv)
 {
     Timers timers{};
-    setupLogger();
 
-    SPDLOG_INFO("GPU Raytracer startup");
-
+    // clang-format off
     argparse::ArgumentParser args("vulkan_tracer");
     args.add_argument("-i", "--input").help("YML file with scene definition");
     args.add_argument("-p", "--preview").help("enable live preview of the rendered image").default_value(false).implicit_value(true);
@@ -28,6 +27,8 @@ int main(int argc, char** argv)
     args.add_argument("-l", "--list-devices").help("show available devices").default_value(false).implicit_value(true);
     args.add_argument("-d", "--device").help("manually specify a device").default_value(-1).scan<'i', int>();
     args.add_argument("-t", "--time").help("aim for a given execution time per scheduled task [ms]").default_value(150).scan<'i', int>();
+    args.add_argument("-v", "--verbose").help("print all logs to console").default_value(false).implicit_value(true);
+    // clang-format on
 
     try
     {
@@ -42,6 +43,17 @@ int main(int argc, char** argv)
         }
         std::cerr << args;
         return 1;
+    }
+
+    auto verbose = args.get<bool>("--verbose");
+
+    if (not verbose)
+    {
+        setupLogger();
+    }
+    else
+    {
+        spdlog::set_level(spdlog::level::debug);
     }
 
     if (args.get<bool>("--list-devices"))
@@ -80,9 +92,10 @@ int main(int argc, char** argv)
     }
 
     runner::VulkanCompute vc{sizeof(InputData), width * height * sizeof(float) * 4, "main.spv", 64, 64, 1, deviceId};
-    runner::ComputeRunner runner{vc, scene.build(), file, schedulerTimeTarget};
+    runner::ComputeRunner runner{vc, scene.build(), file, schedulerTimeTarget, not verbose};
     runner.onDone([&](runner::ComputeRunner& runner) { save(runner.results(), width, height, fmt::format("{}_output.ppm", file)); });
     std::thread runnerThread([&]() { runner.execute(scene.getTargetIterations()); });
+    postprocessing::Executor postprocess{};
 
     if (preview)
     {

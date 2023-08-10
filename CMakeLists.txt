@@ -25,5 +25,9 @@ get_filename_component(GLSL_COMPILER_NAME ${GLSL_COMPILER} NAME_WE)
 
 set(EXTERNALS_DIR "${CMAKE_SOURCE_DIR}/externals")
 
+add_compile_definitions(SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_DEBUG)
+
 add_subdirectory(interface)
 add_subdirectory(src)
+
+

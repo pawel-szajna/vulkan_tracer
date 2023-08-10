@@ -31,6 +31,7 @@ target_link_libraries(
         vktracer::utils
         vktracer::runner
         vktracer::scene
+        vktracer::postprocessing
         spdlog::spdlog
 )
 

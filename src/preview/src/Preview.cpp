@@ -2,17 +2,25 @@
 
 #include "Window.hpp"
 
+#include <postprocessing/Approximation.hpp>
+#include <postprocessing/GaussFilter.hpp>
 #include <runner/ComputeRunner.hpp>
 #include <scene/Scene.hpp>
 #include <utils/Helpers.hpp>
 
+#include <chrono>
+#include <memory>
+#include <spdlog/spdlog.h>
 #include <thread>
 
 namespace vrt::preview
 {
-Preview::Preview(const scene::Scene& scene, runner::ComputeRunner& runner, float scale)
+Preview::Preview(const scene::Scene& scene,
+                 runner::ComputeRunner& runner,
+                 float scale)
     : scene{scene}
     , runner{runner}
+    , postprocess{}
     , window{std::make_unique<Window>(scene.getResolutionWidth(),
                                       scene.getResolutionHeight(),
                                       scale)}
@@ -38,7 +46,11 @@ void Preview::start()
 
     do
     {
+        auto start = std::chrono::system_clock::now();
         runner.obtain(progress, data);
+        SPDLOG_DEBUG("Waiting for current data took {} ms",
+                     std::chrono::duration_cast<std::chrono::milliseconds>(
+                         std::chrono::system_clock::now() - start).count());
 
         if (progress.empty())
         {
@@ -65,7 +77,19 @@ void Preview::start()
             }
         }
 
-        std::this_thread::sleep_for(std::chrono::milliseconds{200});
+        if (not runner.done())
+        {
+            auto approximation = postprocessing::Approximation::createDefault(pixels, width, height);
+            for (const auto& chunk : progress)
+            {
+                approximation->addSector(chunk.x, chunk.y, iterations - chunk.remainingSamples);
+            }
+            postprocess.execute(std::move(approximation));
+        }
+
+        postprocess.execute(std::make_unique<postprocessing::GaussFilter>(pixels, width, height));
+
+        std::this_thread::sleep_for(std::chrono::milliseconds{100});
     }
     while (window->update(pixels));
     runner.abort();

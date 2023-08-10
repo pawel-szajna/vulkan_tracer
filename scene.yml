@@ -3,6 +3,7 @@ Configuration:
     Width: 1280
     Height: 720
   TotalSamples: 250
+  MinimumSamples: 0.33
   ReflectionsLimit: 32
 Camera:
   Origin: [0.45, 1.0, 0.5]

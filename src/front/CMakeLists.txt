@@ -18,16 +18,8 @@ target_include_directories(
     vulkan_tracer
     PRIVATE
         include
-        ${Vulkan_INCLUDE_DIRS}
-        ${Vulkan_INCLUDE_DIRS_Extra}
         ${INTERFACE_DIR}
         ${EXTERNALS_DIR}
-)
-
-target_link_directories(
-    vulkan_tracer
-    PRIVATE
-        ${Vulkan_LIBRARY_DIRS}
 )
 
 target_link_libraries(
@@ -37,30 +29,11 @@ target_link_libraries(
         vktracer::runner
         vktracer::scene
         vktracer::utils
+        vktracer::postprocessing
 
         argparse::argparse
         spdlog::spdlog
         yaml-cpp
-)
-
-if(APPLE)
-    target_link_libraries(
-        vulkan_tracer
-        PRIVATE
-            MoltenVK
-    )
-else()
-    target_link_libraries(
-        vulkan_tracer
-        PRIVATE
-            Vulkan::Vulkan
-    )
-endif()
-
-target_compile_definitions(
-    vulkan_tracer
-    PRIVATE
-        SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_DEBUG
 )
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")

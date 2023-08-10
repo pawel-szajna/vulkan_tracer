@@ -28,7 +28,7 @@ public:
     using ChunkProgressData = std::vector<ChunkProgress>;
     using DoneCallback = std::function<void(ComputeRunner&)>;
 
-    ComputeRunner(VulkanCompute& vulkan, InputData scene, std::string_view name, i32 timeTarget);
+    ComputeRunner(VulkanCompute& vulkan, InputData scene, std::string_view name, i32 timeTarget, bool showProgress);
     void onDone(DoneCallback&& callback);
     void execute(u32 iterations);
     bool done() const;
@@ -50,5 +50,7 @@ private:
 
     ChunkProgressData chunkProgress;
     std::queue<DoneCallback> doneCallbacks;
+
+    bool showProgress;
 };
 }

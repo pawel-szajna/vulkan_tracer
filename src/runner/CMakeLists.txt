@@ -31,7 +31,33 @@ target_link_libraries(
     PUBLIC
         vktracer::types
         vktracer::utils
+        vktracer::postprocessing
         vktracer::generated::interfaces
     PRIVATE
         spdlog::spdlog
 )
+
+if(APPLE)
+    target_include_directories(
+        vulkan_tracer_runner
+        PUBLIC
+            ${Vulkan_INCLUDE_DIRS}
+            ${Vulkan_INCLUDE_DIRS_Extra}
+    )
+    target_link_directories(
+        vulkan_tracer_runner
+        PUBLIC
+            ${Vulkan_LIBRARY_DIRS}
+    )
+    target_link_libraries(
+        vulkan_tracer_runner
+        PUBLIC
+            MoltenVK
+    )
+else()
+    target_link_libraries(
+        vulkan_tracer_runner
+        PUBLIC
+            Vulkan::Vulkan
+    )
+endif()
