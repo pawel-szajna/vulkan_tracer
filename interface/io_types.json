@@ -1,5 +1,5 @@
 {
-    "depends": ["basic_types", "constants"],
+    "depends": ["types/Basic", "constants"],
     "gen": [
         {
             "kind": "buffer",

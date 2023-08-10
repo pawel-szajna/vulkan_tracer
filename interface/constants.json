@@ -1,5 +1,5 @@
 {
-    "depends": ["basic_types"],
+    "depends": ["types/Basic"],
     "gen": [
         {
             "kind": "constant",

@@ -1,6 +1,8 @@
 #pragma once
 
-#include <vulkan/vulkan.hpp>
+#include <types/Basic.hpp>
+#include <utils/Helpers.hpp>
+#include <utils/Timers.hpp>
 
 #include <algorithm>
 #include <chrono>
@@ -8,10 +10,7 @@
 #include <optional>
 #include <string_view>
 #include <spdlog/spdlog.h>
-
-#include "basic_types.hpp"
-#include "helpers.hpp"
-#include "timers.hpp"
+#include <vulkan/vulkan.hpp>
 
 #if defined(DebugBuild) and defined(__unix__) and not defined(__apple__)
 #define DebugRenderdoc

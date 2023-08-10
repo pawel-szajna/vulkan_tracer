@@ -107,7 +107,7 @@ with open(name, 'w') as output:
         output.write("#pragma once\n\n")
         if "depends" in data:
             for dependency in data["depends"]:
-                output.write("#include \"{}.hpp\"\n".format(dependency))
+                output.write("#include <{}.hpp>\n".format(dependency))
             output.write("\n")
     output.write("// Auto-generated on {}\n".format(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
     output.write("// To introduce changes, modify {}.json instead of this file\n\n".format(source))

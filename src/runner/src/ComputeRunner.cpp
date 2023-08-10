@@ -1,7 +1,8 @@
-#include "runner.hpp"
+#include "ComputeRunner.hpp"
 
-#include "helpers.hpp"
-#include "vulkan_compute.hpp"
+#include "VulkanCompute.hpp"
+
+#include <utils/Helpers.hpp>
 
 #include <indicators/indicators.hpp>
 #include <stdexcept>

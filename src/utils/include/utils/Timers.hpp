@@ -4,7 +4,7 @@
 #include <map>
 #include <string>
 
-#include "basic_types.hpp"
+#include <types/Basic.hpp>
 
 using Timestamp = std::chrono::time_point<std::chrono::system_clock>;
 

@@ -1,0 +1,7 @@
+add_subdirectory(types)
+add_subdirectory(utils)
+add_subdirectory(scene)
+add_subdirectory(runner)
+add_subdirectory(preview)
+add_subdirectory(shaders)
+add_subdirectory(front)

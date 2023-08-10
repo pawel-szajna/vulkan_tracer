@@ -6,6 +6,8 @@
 
 #include "io_types.hpp"
 
+// TODO: Those all probably have a better place to belong to
+
 template<typename T>
 struct Printable
 {

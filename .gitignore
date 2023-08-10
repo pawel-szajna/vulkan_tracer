@@ -3,4 +3,5 @@ build
 *.ppm
 *.png
 renderdoc.cap
+vulkan_tracer.log
 

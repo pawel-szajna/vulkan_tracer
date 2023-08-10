@@ -1,6 +1,6 @@
-#include "helpers.hpp"
+#include "Helpers.hpp"
 
-#include "timers.hpp"
+#include "Timers.hpp"
 
 #include <cmath>
 #include <fstream>

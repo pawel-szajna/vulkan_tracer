@@ -1,4 +1,4 @@
-#include "vulkan_compute.hpp"
+#include "VulkanCompute.hpp"
 
 #include <fstream>
 #include <iostream>

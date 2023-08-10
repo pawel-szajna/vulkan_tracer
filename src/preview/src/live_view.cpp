@@ -1,8 +1,8 @@
 #include "live_view.hpp"
 
-#include "helpers.hpp"
-#include "runner.hpp"
-#include "scene.hpp"
+#include <runner/ComputeRunner.hpp>
+#include <utils/Helpers.hpp>
+#include <scene/scene.hpp>
 
 #include <chrono>
 #include <spdlog/spdlog.h>

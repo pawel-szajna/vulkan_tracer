@@ -1,10 +1,10 @@
-#include "helpers.hpp"
-#include "io_types.hpp"
-#include "live_view.hpp"
-#include "runner.hpp"
-#include "scene_reader.hpp"
-#include "timers.hpp"
-#include "vulkan_compute.hpp"
+#include <io_types.hpp>
+#include <preview/live_view.hpp>
+#include <runner/ComputeRunner.hpp>
+#include <runner/VulkanCompute.hpp>
+#include <scene/scene_reader.hpp>
+#include <utils/Helpers.hpp>
+#include <utils/Timers.hpp>
 
 #include <memory>
 #include <thread>
