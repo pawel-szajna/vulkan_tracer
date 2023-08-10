@@ -8,6 +8,8 @@
 #include <stdexcept>
 #include <spdlog/spdlog.h>
 
+namespace vrt::runner
+{
 ComputeRunner::ComputeRunner(VulkanCompute& vulkan, InputData scene, std::string_view name, i32 timeTarget)
     : vulkan{vulkan}
     , scene{scene}
@@ -112,4 +114,5 @@ std::pair<std::vector<float>*, ComputeRunner::ChunkProgressMap*> ComputeRunner::
 {
     vulkan.download(reinterpret_cast<u8*>(data.data()));
     return std::make_pair(&data, &chunkProgress);
+}
 }

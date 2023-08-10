@@ -5,6 +5,8 @@
 #include <spdlog/spdlog.h>
 #include <stdexcept>
 
+namespace vrt::runner
+{
 VulkanCompute::VulkanCompute(usize inputMemorySize,
                              usize outputMemorySize,
                              std::string_view shader,
@@ -358,4 +360,5 @@ void VulkanCompute::download(u8* outputData)
     std::copy(outputView, outputView + outputMemorySize, outputData);
     SPDLOG_DEBUG("Finished");
     device.unmapMemory(outputMemory);
+}
 }

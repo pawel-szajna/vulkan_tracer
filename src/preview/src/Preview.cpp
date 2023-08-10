@@ -10,7 +10,7 @@
 
 namespace vrt::preview
 {
-Preview::Preview(const SceneBuilder& scene, ComputeRunner& runner, float scale)
+Preview::Preview(const SceneBuilder& scene, runner::ComputeRunner& runner, float scale)
     : scene{scene}
     , runner{runner}
     , window{std::make_unique<Window>(scene.getResolutionWidth(),

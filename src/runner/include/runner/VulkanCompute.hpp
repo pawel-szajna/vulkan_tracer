@@ -17,6 +17,8 @@
 #include <renderdoc_app.h>
 #endif
 
+namespace vrt::runner
+{
 class VulkanCompute
 {
 public:
@@ -89,3 +91,4 @@ private:
     RENDERDOC_API_1_6_0* renderdocApi = nullptr;
     #endif
 };
+}

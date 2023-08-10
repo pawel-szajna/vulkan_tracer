@@ -8,6 +8,8 @@
 #include <string_view>
 #include <vector>
 
+namespace vrt::runner
+{
 class VulkanCompute;
 
 class ComputeRunner
@@ -34,3 +36,4 @@ private:
 
     ChunkProgressMap chunkProgress;
 };
+}

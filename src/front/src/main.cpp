@@ -46,7 +46,7 @@ int main(int argc, char** argv)
 
     if (args.get<bool>("--list-devices"))
     {
-        VulkanCompute::listDevices();
+        runner::VulkanCompute::listDevices();
         return 0;
     }
 
@@ -79,8 +79,8 @@ int main(int argc, char** argv)
         scene.setResolution(width, height);
     }
 
-    VulkanCompute vc{sizeof(InputData), width * height * sizeof(float) * 4, "main.spv", 64, 64, 1, deviceId};
-    ComputeRunner runner{vc, scene.build(), file, schedulerTimeTarget};
+    runner::VulkanCompute vc{sizeof(InputData), width * height * sizeof(float) * 4, "main.spv", 64, 64, 1, deviceId};
+    runner::ComputeRunner runner{vc, scene.build(), file, schedulerTimeTarget};
 
     std::thread runnerThread([&]() { runner.execute(scene.getTargetIterations()); });
 
