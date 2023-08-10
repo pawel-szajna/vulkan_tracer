@@ -2,13 +2,16 @@
 
 #include <memory>
 
-class SceneBuilder;
-
 namespace vrt
 {
 namespace runner
 {
 class ComputeRunner;
+}
+
+namespace scene
+{
+class Scene;
 }
 
 namespace preview
@@ -19,14 +22,14 @@ class Preview
 {
 public:
 
-    Preview(const SceneBuilder& scene, runner::ComputeRunner& runner, float scale);
+    Preview(const scene::Scene& scene, runner::ComputeRunner& runner, float scale);
     ~Preview();
 
     void start();
 
 private:
 
-    const SceneBuilder& scene;
+    const scene::Scene& scene;
     runner::ComputeRunner& runner;
     std::unique_ptr<Window> window;
 };

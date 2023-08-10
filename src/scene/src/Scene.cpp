@@ -1,10 +1,10 @@
-#include "scene.hpp"
-
-#include <spdlog/spdlog.h>
-#include <stdexcept>
+#include "Scene.hpp"
 
 #include <constants.hpp>
 #include <utils/Helpers.hpp>
+
+#include <spdlog/spdlog.h>
+#include <stdexcept>
 
 namespace
 {
@@ -16,12 +16,14 @@ void assignVector(float* target, vec3 source)
 }
 }
 
-SceneBuilder::SceneBuilder()
+namespace vrt::scene
+{
+Scene::Scene()
 {
     changeRandomSeed(inputs);
 }
 
-InputData SceneBuilder::build()
+InputData Scene::build()
 {
     auto consumption = inputs.shapesCount + inputs.materialsCount + (vectorId * 4) + scalarId + integerId;
 
@@ -38,29 +40,29 @@ InputData SceneBuilder::build()
     return inputs;
 }
 
-u32 SceneBuilder::getResolutionWidth() const
+u32 Scene::getResolutionWidth() const
 {
     return inputs.renderWidth;
 }
 
-u32 SceneBuilder::getResolutionHeight() const
+u32 Scene::getResolutionHeight() const
 {
     return inputs.renderHeight;
 }
 
-void SceneBuilder::setResolution(u32 width, u32 height)
+void Scene::setResolution(u32 width, u32 height)
 {
     inputs.renderWidth  = width;
     inputs.renderHeight = height;
 }
 
-void SceneBuilder::setBackground(vec3 color, float intensity)
+void Scene::setBackground(vec3 color, float intensity)
 {
     assignVector(inputs.background, color);
     inputs.background[3] = intensity;
 }
 
-void SceneBuilder::setCamera(vec3 origin, vec3 target, vec3 up, float fov)
+void Scene::setCamera(vec3 origin, vec3 target, vec3 up, float fov)
 {
     assignVector(inputs.cameraOrigin, origin);
     assignVector(inputs.cameraTarget, target);
@@ -68,63 +70,63 @@ void SceneBuilder::setCamera(vec3 origin, vec3 target, vec3 up, float fov)
     inputs.cameraFov = fov;
 }
 
-u32 SceneBuilder::getTargetIterations() const
+u32 Scene::getTargetIterations() const
 {
     return targetIterations;
 }
 
-u32 SceneBuilder::getMaterialsCount() const
+u32 Scene::getMaterialsCount() const
 {
     return inputs.materialsCount;
 }
 
-void SceneBuilder::setSamplesPerShaderPass(u32 count)
+void Scene::setSamplesPerShaderPass(u32 count)
 {
     inputs.samplesPerShader = count;
 }
 
-void SceneBuilder::setTargetIterations(u32 count)
+void Scene::setTargetIterations(u32 count)
 {
     targetIterations = count;
 }
 
-void SceneBuilder::setReflectionsLimit(u32 count)
+void Scene::setReflectionsLimit(u32 count)
 {
     inputs.reflectionsLimit = count;
 }
 
-void SceneBuilder::addMaterialDiffuse(vec3 color)
+void Scene::addMaterialDiffuse(vec3 color)
 {
     addVector(color);
     addMaterial(MaterialType::Diffuse);
 }
 
-void SceneBuilder::addMaterialMirror(vec3 color)
+void Scene::addMaterialMirror(vec3 color)
 {
     addVector(color);
     addMaterial(MaterialType::Mirror);
 }
 
-void SceneBuilder::addMaterialFog(float intensity)
+void Scene::addMaterialFog(float intensity)
 {
     addScalar(intensity);
     addMaterial(MaterialType::Fog);
 }
 
-void SceneBuilder::addMaterialLight(vec3 color, float intensity)
+void Scene::addMaterialLight(vec3 color, float intensity)
 {
     addVector(color);
     addScalar(intensity);
     addMaterial(MaterialType::Light);
 }
 
-void SceneBuilder::addMaterialGlass(float refractiveIndex)
+void Scene::addMaterialGlass(float refractiveIndex)
 {
     addScalar(refractiveIndex);
     addMaterial(MaterialType::Glass);
 }
 
-void SceneBuilder::addShapeSphere(vec3 center, float radius, i32 material)
+void Scene::addShapeSphere(vec3 center, float radius, i32 material)
 {
     addVector(center);
     addScalar(radius);
@@ -132,7 +134,7 @@ void SceneBuilder::addShapeSphere(vec3 center, float radius, i32 material)
     addShape(ShapeType::Sphere);
 }
 
-void SceneBuilder::addShapeCloud(vec3 center, float radius, float intensity, i32 material)
+void Scene::addShapeCloud(vec3 center, float radius, float intensity, i32 material)
 {
     addVector(center);
     addScalar(radius);
@@ -141,7 +143,7 @@ void SceneBuilder::addShapeCloud(vec3 center, float radius, float intensity, i32
     addShape(ShapeType::Cloud);
 }
 
-void SceneBuilder::addShapePrism(float top, float bottom, std::vector<vec3> vertices, i32 material)
+void Scene::addShapePrism(float top, float bottom, std::vector<vec3> vertices, i32 material)
 {
     for (const auto& vertex : vertices)
     {
@@ -154,7 +156,7 @@ void SceneBuilder::addShapePrism(float top, float bottom, std::vector<vec3> vert
     addShape(ShapeType::Prism);
 }
 
-void SceneBuilder::addMaterial(MaterialType material)
+void Scene::addMaterial(MaterialType material)
 {
     if (inputs.materialsCount == materialsLimit)
     {
@@ -169,7 +171,7 @@ void SceneBuilder::addMaterial(MaterialType material)
     inputs.materials[inputs.materialsCount++] = std::to_underlying(material);
 }
 
-void SceneBuilder::addShape(ShapeType shape)
+void Scene::addShape(ShapeType shape)
 {
     if (inputs.shapesCount == shapesLimit)
     {
@@ -179,7 +181,7 @@ void SceneBuilder::addShape(ShapeType shape)
     inputs.shapes[inputs.shapesCount++] = std::to_underlying(shape);
 }
 
-void SceneBuilder::addVector(vec3 vector)
+void Scene::addVector(vec3 vector)
 {
     if (vectorId == vectorsLimit)
     {
@@ -193,7 +195,7 @@ void SceneBuilder::addVector(vec3 vector)
     vectorId++;
 }
 
-void SceneBuilder::addScalar(float scalar)
+void Scene::addScalar(float scalar)
 {
     if (scalarId == scalarsLimit)
     {
@@ -203,7 +205,7 @@ void SceneBuilder::addScalar(float scalar)
     inputs.scalars[scalarId++] = scalar;
 }
 
-void SceneBuilder::addInteger(i32 integer)
+void Scene::addInteger(i32 integer)
 {
     if (integerId == integersLimit)
     {
@@ -211,4 +213,5 @@ void SceneBuilder::addInteger(i32 integer)
     }
 
     inputs.integers[integerId++] = integer;
+}
 }

@@ -3,14 +3,14 @@
 #include "Window.hpp"
 
 #include <runner/ComputeRunner.hpp>
-#include <scene/scene.hpp>
+#include <scene/Scene.hpp>
 #include <utils/Helpers.hpp>
 
 #include <thread>
 
 namespace vrt::preview
 {
-Preview::Preview(const SceneBuilder& scene, runner::ComputeRunner& runner, float scale)
+Preview::Preview(const scene::Scene& scene, runner::ComputeRunner& runner, float scale)
     : scene{scene}
     , runner{runner}
     , window{std::make_unique<Window>(scene.getResolutionWidth(),

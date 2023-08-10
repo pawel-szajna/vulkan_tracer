@@ -1,8 +1,8 @@
 add_library(
     vulkan_tracer_scene
     STATIC
-        src/scene.cpp
-        src/scene_reader.cpp
+        src/Scene.cpp
+        src/Reader.cpp
 )
 
 add_library(

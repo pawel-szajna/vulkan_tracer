@@ -1,32 +1,19 @@
 #pragma once
 
+#include "Material.hpp"
+#include "Shape.hpp"
+
 #include <io_types.hpp>
 
 #include <vector>
 
-enum class ShapeType : uint32_t
+namespace vrt::scene
 {
-    Invalid,
-    Sphere,
-    Cloud,
-    Prism,
-};
-
-enum class MaterialType : uint32_t
-{
-    Invalid,
-    Diffuse,
-    Mirror,
-    Fog,
-    Light,
-    Glass,
-};
-
-class SceneBuilder
+class Scene
 {
 public:
 
-    SceneBuilder();
+    Scene();
 
     InputData build();
 
@@ -69,3 +56,4 @@ private:
 
     u32 targetIterations{};
 };
+}

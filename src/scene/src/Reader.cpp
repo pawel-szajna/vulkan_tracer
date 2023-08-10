@@ -1,4 +1,4 @@
-#include "scene_reader.hpp"
+#include "Reader.hpp"
 
 #include <algorithm>
 #include <iterator>
@@ -19,7 +19,7 @@ class SceneReaderImpl
 public:
 
     explicit SceneReaderImpl(YAML::Node& root);
-    SceneBuilder operator()();
+    vrt::scene::Scene operator()();
 
 private:
 
@@ -44,7 +44,7 @@ private:
     void saveMaterial(i32 id, const YAML::Node& node);
 
     YAML::Node& root;
-    SceneBuilder scene;
+    vrt::scene::Scene scene;
     std::map<std::string, i32> materialNames;
 };
 
@@ -53,7 +53,7 @@ SceneReaderImpl::SceneReaderImpl(YAML::Node& root)
     , scene{}
 {}
 
-SceneBuilder SceneReaderImpl::operator()()
+vrt::scene::Scene SceneReaderImpl::operator()()
 {
     try
     {
@@ -262,9 +262,12 @@ void SceneReaderImpl::readGlass(i32 id, const YAML::Node& glass)
 }
 } // namespace
 
-SceneBuilder SceneReader::read(std::string_view filename)
+namespace vrt::scene
+{
+Scene read(std::string_view filename)
 {
     SPDLOG_INFO("Loading scene configuration from {}", filename);
     auto data = YAML::LoadFile(std::string(filename));
-    return SceneReaderImpl{data}();
+    return ::SceneReaderImpl{data}();
+}
 }

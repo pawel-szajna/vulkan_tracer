@@ -2,7 +2,7 @@
 #include <preview/Preview.hpp>
 #include <runner/ComputeRunner.hpp>
 #include <runner/VulkanCompute.hpp>
-#include <scene/scene_reader.hpp>
+#include <scene/Reader.hpp>
 #include <utils/Helpers.hpp>
 #include <utils/Timers.hpp>
 
@@ -65,7 +65,7 @@ int main(int argc, char** argv)
     auto deviceId = args.get<int>("--device");
     auto preview = args.get<bool>("--preview");
     auto file = args.get<std::string>("--input");
-    auto scene = SceneReader::read(file);
+    auto scene = vrt::scene::read(file);
 
     auto width  = scene.getResolutionWidth();
     auto height = scene.getResolutionHeight();
