@@ -37,6 +37,7 @@ class Window
 public:
 
      Window(int width, int height, float scale);
+     bool update(const std::vector<u32>& pixels);
 
 };
 
