@@ -26,26 +26,38 @@ Preview::~Preview()
 void Preview::start()
 {
     std::vector<u32> pixels;
+    std::vector<float> data;
+    runner::ComputeRunner::ChunkProgressData progress;
+
     auto width = scene.getResolutionWidth();
     auto height = scene.getResolutionHeight();
+    auto iterations = scene.getTargetIterations();
+
     pixels.resize(width * height);
+    data.reserve(width * height * 4);
 
     do
     {
-        auto [data, chunkProgress] = runner.results();
+        runner.obtain(progress, data);
+
+        if (progress.empty())
+        {
+            continue;
+        }
+
         for (int y = 0; y < height; ++y)
         {
+            int segmentY = y / 64;
             for (int x = 0; x < width; ++x)
             {
                 int segmentX = x / 64;
-                int segmentY = y / 64;
-                auto currentChunkIterations = chunkProgress->operator[]({segmentX, segmentY}).first;
-                auto chunkDoneIterations = scene.getTargetIterations() - currentChunkIterations + 1;
-                float chunkWeight = float(scene.getTargetIterations()) / float(chunkDoneIterations);
-                auto [r, g, b] = xyzToRgb(chunkWeight * data->operator[]((x + y * width) * 4),
-                                          chunkWeight * data->operator[]((x + y * width) * 4 + 1),
-                                          chunkWeight * data->operator[]((x + y * width) * 4 + 2));
-                pixels[x + (height - y - 1) * width]
+                auto& chunkInfo = progress[segmentX + segmentY * width / 64];
+                auto chunkDoneIterations = std::max(1u, iterations - chunkInfo.remainingSamples);
+                float chunkWeight = float(iterations) / float(chunkDoneIterations);
+                auto [r, g, b] = xyzToRgb(chunkWeight * data[(x + y * width) * 4],
+                                          chunkWeight * data[(x + y * width) * 4 + 1],
+                                          chunkWeight * data[(x + y * width) * 4 + 2]);
+                pixels[x + y * width]
                     = exportColor(r) << 24
                     | exportColor(g) << 16
                     | exportColor(b) << 8
@@ -53,7 +65,7 @@ void Preview::start()
             }
         }
 
-        std::this_thread::sleep_for(std::chrono::milliseconds{250});
+        std::this_thread::sleep_for(std::chrono::milliseconds{200});
     }
     while (window->update(pixels));
     runner.abort();

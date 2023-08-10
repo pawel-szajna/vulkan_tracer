@@ -4,7 +4,9 @@
 #include <types/Basic.hpp>
 
 #include <atomic>
+#include <functional>
 #include <map>
+#include <queue>
 #include <string_view>
 #include <vector>
 
@@ -15,13 +17,25 @@ class VulkanCompute;
 class ComputeRunner
 {
 public:
+    struct ChunkProgress
+    {
+        u32 x;
+        u32 y;
+        u32 timePerSample;
+        u32 remainingSamples;
+    };
 
-    using ChunkProgressMap = std::map<std::pair<u32, u32>, std::pair<u32, u32>>;
+    using ChunkProgressData = std::vector<ChunkProgress>;
+    using DoneCallback = std::function<void(ComputeRunner&)>;
 
     ComputeRunner(VulkanCompute& vulkan, InputData scene, std::string_view name, i32 timeTarget);
+    void onDone(DoneCallback&& callback);
     void execute(u32 iterations);
+    bool done() const;
     void abort();
-    std::pair<std::vector<float>*, ComputeRunner::ChunkProgressMap*> results();
+
+    const std::vector<float>& results();
+    void obtain(ChunkProgressData& progress, std::vector<float>& data);
 
 private:
 
@@ -34,6 +48,7 @@ private:
 
     std::atomic<bool> running;
 
-    ChunkProgressMap chunkProgress;
+    ChunkProgressData chunkProgress;
+    std::queue<DoneCallback> doneCallbacks;
 };
 }

@@ -2,8 +2,14 @@
 
 #include <fstream>
 #include <iostream>
+#include <mutex>
 #include <spdlog/spdlog.h>
 #include <stdexcept>
+
+namespace
+{
+std::mutex mutex{};
+}
 
 namespace vrt::runner
 {
@@ -298,6 +304,7 @@ void VulkanCompute::createPipeline()
 u64 VulkanCompute::execute()
 {
     SPDLOG_DEBUG("Submitting execution to GPU");
+    std::scoped_lock lock{mutex};
 
     #if defined(DebugRenderdoc)
     if (renderdocApi != nullptr)
@@ -354,6 +361,7 @@ u64 VulkanCompute::execute()
 
 void VulkanCompute::download(u8* outputData)
 {
+    std::scoped_lock lock{mutex};
     SPDLOG_INFO("Downloading data from GPU memory");
     auto timer      = Timers::create("Data download");
     auto outputView = static_cast<u8*>(device.mapMemory(outputMemory, 0, outputMemorySize));

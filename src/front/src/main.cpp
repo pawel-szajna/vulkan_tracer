@@ -81,7 +81,7 @@ int main(int argc, char** argv)
 
     runner::VulkanCompute vc{sizeof(InputData), width * height * sizeof(float) * 4, "main.spv", 64, 64, 1, deviceId};
     runner::ComputeRunner runner{vc, scene.build(), file, schedulerTimeTarget};
-
+    runner.onDone([&](runner::ComputeRunner& runner) { save(runner.results(), width, height, fmt::format("{}_output.ppm", file)); });
     std::thread runnerThread([&]() { runner.execute(scene.getTargetIterations()); });
 
     if (preview)
@@ -94,9 +94,6 @@ int main(int argc, char** argv)
     {
         runnerThread.join();
     }
-
-    auto [results, _] = runner.results();
-    save(*results, width, height, fmt::format("{}_output.ppm", file));
 
     #if not defined(DebugBuild)
     }

@@ -1,14 +1,14 @@
 Configuration:
   Resolution:
-    Width: 1920
-    Height: 1080
-  TotalSamples: 4000
+    Width: 1280
+    Height: 720
+  TotalSamples: 250
   ReflectionsLimit: 32
 Camera:
   Origin: [0.45, 1.0, 0.5]
   Target: [-0.15, 0, -1.85]
   Up: [0, 1, 0]
-  FieldOfVision: 64
+  FieldOfVision: 50
 Background:
   Color: [440, 760, 40]
   Intensity: 0.02
@@ -96,7 +96,7 @@ Shapes:
       Material: Glass
   - Prism:
       Top: 0.35
-      Bottom: -0.4
+      Bottom: -0.45
       Vertices: [
         [-0.4, 0, -2.3],
         [-0.9, 0, -1.8],

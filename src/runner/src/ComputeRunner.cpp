@@ -5,8 +5,14 @@
 #include <utils/Helpers.hpp>
 
 #include <indicators/indicators.hpp>
-#include <stdexcept>
+#include <mutex>
+#include <numeric>
 #include <spdlog/spdlog.h>
+
+namespace
+{
+std::mutex mutex{};
+}
 
 namespace vrt::runner
 {
@@ -29,6 +35,17 @@ void ComputeRunner::abort()
     running = false;
 }
 
+void ComputeRunner::onDone(ComputeRunner::DoneCallback&& callback)
+{
+    if (running)
+    {
+        SPDLOG_ERROR("Cannot register more callbacks once the task has been launched!");
+        return;
+    }
+
+    doneCallbacks.emplace(callback);
+}
+
 void ComputeRunner::execute(u32 iterations)
 {
     running = true;
@@ -46,13 +63,18 @@ void ComputeRunner::execute(u32 iterations)
     u32 chunksHorizontal = scene.renderWidth / chunkSize;
     u32 chunksVertical = scene.renderHeight / chunkSize;
 
-    chunkProgress.clear();
+    std::vector<u32> renderOrder{};
+    renderOrder.resize(chunksHorizontal * chunksVertical);
+    std::iota(renderOrder.begin(), renderOrder.end(), 0u);
 
-    for (u32 i = 0; i < chunksHorizontal; ++i)
+    chunkProgress.clear();
+    chunkProgress.reserve(chunksHorizontal * chunksVertical);
+
+    for (u32 j = 0; j < chunksVertical; ++j)
     {
-        for (u32 j = 0; j < chunksVertical; ++j)
+        for (u32 i = 0; i < chunksHorizontal; ++i)
         {
-            chunkProgress[{i, j}] = {iterations, targetTime / 4};
+            chunkProgress.push_back(ChunkProgress{i, j, targetTime / 2u, iterations});
         }
     }
 
@@ -69,50 +91,82 @@ void ComputeRunner::execute(u32 iterations)
     };
     indicators::show_console_cursor(false);
 
-    while (remaining > 0)
+    while (remaining > 0 and running)
     {
-        for (u32 i = 0; i < chunksHorizontal; ++i)
+        std::sort(renderOrder.begin(),
+                  renderOrder.end(),
+                  [&p = this->chunkProgress](u32 lhs, u32 rhs)
+                  {
+                      return p[lhs].timePerSample < p[rhs].timePerSample;
+                  });
+
+        for (auto chunkId : renderOrder)
         {
-            for (u32 j = 0; j < chunksVertical and running; ++j)
+            if (not running)
             {
-                if (chunkProgress[{i, j}].first == 0)
-                {
-                    continue;
-                }
-
-                u32 samples = 1;
-                if (chunkProgress[{i, j}].second > 0)
-                {
-                    samples = std::min(std::max(1u, targetTime / chunkProgress[{i, j}].second), chunkProgress[{i, j}].first);
-                }
-                SPDLOG_DEBUG("Rendering chunk {{{}, {}}}. Last average time per sample: {} ms, remaining samples: {}, queued samples: {}, ",
-                             i, j, chunkProgress[{i, j}].second / 1000.f, chunkProgress[{i, j}].first, samples);
-
-                changeRandomSeed(scene);
-                scene.samplesPerShader = samples;
-                scene.offsetX = i * chunkSize;
-                scene.offsetY = j * chunkSize;
-                scene.weight = invIterations;
-
-                vulkan.upload(scene);
-                u64 execTime = vulkan.execute();
-
-                chunkProgress[{i, j}].first -= samples;
-                chunkProgress[{i, j}].second = execTime / samples;
-                remaining -= samples;
-
-                SPDLOG_INFO("Rendering progress: {}%", 100 * (total - remaining) / total);
-                progressBar.set_progress(100.f * (total - remaining) / total);
+                break;
             }
+
+            auto& chunk = chunkProgress[chunkId];
+
+            if (chunk.remainingSamples == 0)
+            {
+                continue;
+            }
+
+            u32 samples = 1;
+            if (chunk.timePerSample > 0)
+            {
+                samples = std::min(std::max(1u, targetTime / chunk.timePerSample), chunk.remainingSamples);
+            }
+
+            SPDLOG_DEBUG("Rendering chunk {{{}, {}}}. Last average time per sample: {} ms, remaining samples: {}, queued samples: {}",
+                         chunk.x, chunk.y, chunk.timePerSample / 1000.f, chunk.remainingSamples, samples);
+
+            changeRandomSeed(scene);
+            scene.samplesPerShader = samples;
+            scene.offsetX = chunk.x * chunkSize;
+            scene.offsetY = chunk.y * chunkSize;
+            scene.weight = invIterations;
+
+            std::scoped_lock lock{mutex};
+            vulkan.upload(scene);
+            u64 execTime = vulkan.execute();
+            chunk.remainingSamples -= samples;
+            chunk.timePerSample = execTime / samples;
+            remaining -= samples;
+
+            progressBar.set_progress(100.f * (total - remaining) / total);
         }
     }
 
+    while (not doneCallbacks.empty())
+    {
+        doneCallbacks.front()(*this);
+        doneCallbacks.pop();
+    }
+
     indicators::show_console_cursor(true);
+
+    running = false;
 }
 
-std::pair<std::vector<float>*, ComputeRunner::ChunkProgressMap*> ComputeRunner::results()
+const std::vector<float>& ComputeRunner::results()
 {
     vulkan.download(reinterpret_cast<u8*>(data.data()));
-    return std::make_pair(&data, &chunkProgress);
+    return data;
+}
+
+bool ComputeRunner::done() const
+{
+    return not running;
+}
+
+void ComputeRunner::obtain(ChunkProgressData& progress, std::vector<float>& pixels)
+{
+    std::scoped_lock lock{mutex};
+    results();
+    progress.assign(chunkProgress.begin(), chunkProgress.end());
+    pixels.assign(data.begin(), data.end());
 }
 }

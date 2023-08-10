@@ -29,6 +29,20 @@ vec3 randomUnit()
     return normalize(randomVector(-1, 1));
 }
 
+vec3 randomFocusRing(float apertureSize)
+{
+    vec3 point;
+    while (true)
+    {
+        point = vec3(random(-1, 1), random(-1, 1), 0);
+        if (length(point) < 1)
+        {
+            break;
+        }
+    }
+    return apertureSize * point;
+}
+
 vec3 randomInSphere()
 {
     while (true)
