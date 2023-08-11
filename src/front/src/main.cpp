@@ -28,6 +28,7 @@ int main(int argc, char** argv)
     args.add_argument("-d", "--device").help("manually specify a device").default_value(-1).scan<'i', int>();
     args.add_argument("-t", "--time").help("aim for a given execution time per scheduled task [ms]").default_value(150).scan<'i', int>();
     args.add_argument("-v", "--verbose").help("print all logs to console").default_value(false).implicit_value(true);
+    args.add_argument("-n", "--no-postprocessing").help("disable postprocessing").default_value(false).implicit_value(true);
     // clang-format on
 
     try
@@ -46,6 +47,7 @@ int main(int argc, char** argv)
     }
 
     auto verbose = args.get<bool>("--verbose");
+    auto postprocessingDisabled = args.get<bool>("--no-postprocessing");
 
     if (not verbose)
     {
@@ -100,7 +102,7 @@ int main(int argc, char** argv)
     if (preview)
     {
         auto scale = args.get<float>("--scale");
-        preview::Preview{scene, runner, scale}.start();
+        preview::Preview{scene, runner, scale, not postprocessingDisabled}.start();
     }
 
     if (runnerThread.joinable())

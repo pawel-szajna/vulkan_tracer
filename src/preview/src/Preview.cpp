@@ -17,10 +17,12 @@ namespace vrt::preview
 {
 Preview::Preview(const scene::Scene& scene,
                  runner::ComputeRunner& runner,
-                 float scale)
+                 float scale,
+                 bool enablePostprocessing)
     : scene{scene}
     , runner{runner}
     , postprocess{}
+    , postprocessingEnabled{enablePostprocessing}
     , window{std::make_unique<Window>(scene.getResolutionWidth(),
                                       scene.getResolutionHeight(),
                                       scale)}
@@ -77,17 +79,20 @@ void Preview::start()
             }
         }
 
-        if (not runner.done())
+        if (postprocessingEnabled)
         {
-            auto approximation = postprocessing::Approximation::createDefault(pixels, width, height);
-            for (const auto& chunk : progress)
+            if (not runner.done())
             {
-                approximation->addSector(chunk.x, chunk.y, iterations - chunk.remainingSamples);
+                auto approximation = postprocessing::Approximation::createDefault(pixels, width, height);
+                for (const auto& chunk : progress)
+                {
+                    approximation->addSector(chunk.x, chunk.y, iterations - chunk.remainingSamples);
+                }
+                postprocess.execute(std::move(approximation));
             }
-            postprocess.execute(std::move(approximation));
-        }
 
-        postprocess.execute(std::make_unique<postprocessing::GaussFilter>(pixels, width, height));
+            postprocess.execute(std::make_unique<postprocessing::GaussFilter>(pixels, width, height));
+        }
 
         std::this_thread::sleep_for(std::chrono::milliseconds{100});
     }
