@@ -110,7 +110,7 @@ void GaussFilter::processRow()
                        std::multiplies<>());
         result.push_back(u32(std::accumulate(multiplied.begin(),
                                              multiplied.end(),
-                                             RGBPixel{0, 0, 0}) / 273));
+                                             RGBPixel{0, 0, 0}) / weight));
         moveWindowRight(img, window, x + 1, row);
     }
 
