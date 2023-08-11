@@ -17,7 +17,7 @@
 
 ReflectionOpt Scene_reflect(Ray ray, CollisionOpt collision)
 {
-    switch (inputs.materials[collision.material])
+    switch (inputs.materials[collision.material].x)
     {
     case MaterialType_Diffuse:
         return Diffuse_reflect(ray, collision);
@@ -38,7 +38,7 @@ ReflectionOpt Scene_reflect(Ray ray, CollisionOpt collision)
 
 float Scene_shine(float wavelength, int material)
 {
-    switch(inputs.materials[material])
+    switch(inputs.materials[material].x)
     {
     case MaterialType_Light:
         return Light_shine(wavelength, material);
@@ -47,53 +47,40 @@ float Scene_shine(float wavelength, int material)
     }
 }
 
-CollisionOpt Scene_hit(Ray ray, DataUsage usage, float min, float max)
+CollisionOpt Scene_hit(Ray ray, float min, float max)
 {
     CollisionOpt closest = NoCollision;
-
-    uint vectorId = usage.vectors;
-    uint scalarId = usage.scalars;
-    uint integerId = usage.integers;
 
     for (uint i = 0; i < inputs.shapesCount; ++i)
     {
         CollisionOpt current = NoCollision;
 
-        switch (inputs.shapes[i])
+        switch (inputs.shapes[i].x)
         {
         case ShapeType_Sphere:
             {
-                vec3 center = inputs.vectors[vectorId].xyz;
-                float radius = inputs.scalars[scalarId];
-                int material = inputs.integers[integerId];
+                vec3 center = inputs.vectors[inputs.shapes[i].y].xyz;
+                float radius = inputs.scalars[inputs.shapes[i].z];
+                int material = inputs.integers[inputs.shapes[i].w];
                 current = Sphere_hit(center, radius, material, ray, min, closest.position);
-                vectorId += 1;
-                scalarId += 1;
-                integerId += 1;
                 break;
             }
         case ShapeType_Cloud:
             {
-                vec3 center = inputs.vectors[vectorId].xyz;
-                float radius = inputs.scalars[scalarId];
-                float intensity = inputs.scalars[scalarId+1];
-                int material = inputs.integers[integerId];
+                vec3 center = inputs.vectors[inputs.shapes[i].x].xyz;
+                float radius = inputs.scalars[inputs.shapes[i].z];
+                float intensity = inputs.scalars[inputs.shapes[i].z+1];
+                int material = inputs.integers[inputs.shapes[i].w];
                 current = Cloud_hit(center, radius, intensity, material, ray, min, closest.position);
-                vectorId += 1;
-                scalarId += 2;
-                integerId += 1;
                 break;
             }
         case ShapeType_Prism:
             {
-                float top = inputs.scalars[scalarId];
-                float bottom = inputs.scalars[scalarId+1];
-                int vertices = inputs.integers[integerId];
-                int material = inputs.integers[integerId+1];
-                current = Prism_hit(top, bottom, vertices, vectorId, material, ray, min, closest.position);
-                scalarId += 2;
-                integerId += 2;
-                vectorId += vertices;
+                float top = inputs.scalars[inputs.shapes[i].z];
+                float bottom = inputs.scalars[inputs.shapes[i].z+1];
+                int vertices = inputs.integers[inputs.shapes[i].w];
+                int material = inputs.integers[inputs.shapes[i].w+1];
+                current = Prism_hit(top, bottom, vertices, inputs.shapes[i].y, material, ray, min, closest.position);
                 break;
             }
         default:

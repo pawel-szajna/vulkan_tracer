@@ -20,7 +20,6 @@ void main()
     initializeRng(x, y);
 
     uint samples = inputs.samplesPerShader;
-    DataUsage usage = materialsDataUsage(inputs.materialsCount);
 
     // Nikon DX sensor size: 24x16mm
     // f = (H * WD) / FOV
@@ -96,7 +95,7 @@ void main()
         };
 
         pixel += inputs.weight
-               * trace(ray, usage)
+               * trace(ray)
                * vec3(colorSpaceX(ray.wavelength),
                       colorSpaceY(ray.wavelength),
                       colorSpaceZ(ray.wavelength));

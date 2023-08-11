@@ -97,54 +97,55 @@ void Scene::setReflectionsLimit(u32 count)
 
 void Scene::addMaterialDiffuse(vec3 color)
 {
-    addVector(color);
     addMaterial(MaterialType::Diffuse);
+    addVector(color);
 }
 
 void Scene::addMaterialMirror(vec3 color)
 {
-    addVector(color);
     addMaterial(MaterialType::Mirror);
+    addVector(color);
 }
 
 void Scene::addMaterialFog(float intensity)
 {
-    addScalar(intensity);
     addMaterial(MaterialType::Fog);
+    addScalar(intensity);
 }
 
 void Scene::addMaterialLight(vec3 color, float intensity)
 {
+    addMaterial(MaterialType::Light);
     addVector(color);
     addScalar(intensity);
-    addMaterial(MaterialType::Light);
 }
 
 void Scene::addMaterialGlass(float refractiveIndex)
 {
-    addScalar(refractiveIndex);
     addMaterial(MaterialType::Glass);
+    addScalar(refractiveIndex);
 }
 
 void Scene::addShapeSphere(vec3 center, float radius, i32 material)
 {
+    addShape(ShapeType::Sphere);
     addVector(center);
     addScalar(radius);
     addInteger(material);
-    addShape(ShapeType::Sphere);
 }
 
 void Scene::addShapeCloud(vec3 center, float radius, float intensity, i32 material)
 {
+    addShape(ShapeType::Cloud);
     addVector(center);
     addScalar(radius);
     addScalar(-1.f / intensity);
     addInteger(material);
-    addShape(ShapeType::Cloud);
 }
 
 void Scene::addShapePrism(float top, float bottom, std::vector<vec3> vertices, i32 material)
 {
+    addShape(ShapeType::Prism);
     for (const auto& vertex : vertices)
     {
         addVector(vertex);
@@ -153,7 +154,6 @@ void Scene::addShapePrism(float top, float bottom, std::vector<vec3> vertices, i
     addScalar(bottom);
     addInteger(vertices.size());
     addInteger(material);
-    addShape(ShapeType::Prism);
 }
 
 void Scene::addMaterial(MaterialType material)
@@ -163,12 +163,12 @@ void Scene::addMaterial(MaterialType material)
         throw std::length_error("Too many materials");
     }
 
-    if (inputs.shapesCount > 0)
-    {
-        throw std::logic_error("Materials cannot be added once a shape has been defined");
-    }
+    inputs.materials[inputs.materialsCount * 4 + 0] = std::to_underlying(material);
+    inputs.materials[inputs.materialsCount * 4 + 1] = vectorId;
+    inputs.materials[inputs.materialsCount * 4 + 2] = scalarId;
+    inputs.materials[inputs.materialsCount * 4 + 3] = integerId;
 
-    inputs.materials[inputs.materialsCount++] = std::to_underlying(material);
+    inputs.materialsCount++;
 }
 
 void Scene::addShape(ShapeType shape)
@@ -178,7 +178,12 @@ void Scene::addShape(ShapeType shape)
         throw std::length_error("Too many shapes");
     }
 
-    inputs.shapes[inputs.shapesCount++] = std::to_underlying(shape);
+    inputs.shapes[inputs.shapesCount * 4 + 0] = std::to_underlying(shape);
+    inputs.shapes[inputs.shapesCount * 4 + 1] = vectorId;
+    inputs.shapes[inputs.shapesCount * 4 + 2] = scalarId;
+    inputs.shapes[inputs.shapesCount * 4 + 3] = integerId;
+
+    inputs.shapesCount++;
 }
 
 void Scene::addVector(vec3 vector)
@@ -188,7 +193,7 @@ void Scene::addVector(vec3 vector)
         throw std::length_error("Too many vectors");
     }
 
-    inputs.vectors[vectorId * 4]     = vector.x;
+    inputs.vectors[vectorId * 4 + 0] = vector.x;
     inputs.vectors[vectorId * 4 + 1] = vector.y;
     inputs.vectors[vectorId * 4 + 2] = vector.z;
 

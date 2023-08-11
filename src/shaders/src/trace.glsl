@@ -1,15 +1,17 @@
 #pragma once
-#include "types/ray.glsl"
-#include "types/collision.glsl"
-#include "materials/material.glsl"
 
-float trace(Ray ray, DataUsage usage)
+#include "types/collision.glsl"
+#include "types/ray.glsl"
+#include "types/reflection.glsl"
+#include "utils/random.glsl"
+
+float trace(Ray ray)
 {
     float intensity = 1.0;
 
     for (uint i = 0; i < inputs.reflectionsLimit; ++i)
     {
-        CollisionOpt collision = Scene_hit(ray, usage, 0.001, 1.0 / 0.0);
+        CollisionOpt collision = Scene_hit(ray, 0.001, 1.0 / 0.0);
         if (!collision.valid)
         {
             return intensity * inputs.background.w * colorIntensity(ray.wavelength, inputs.background.xyz);

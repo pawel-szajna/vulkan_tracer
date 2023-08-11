@@ -1,11 +1,14 @@
 #pragma once
-#include "../materials/material.glsl"
+
 #include "../types/collision.glsl"
 #include "../types/ray.glsl"
+#include "../types/reflection.glsl"
 #include "../utils/random.glsl"
 
 float Light_shine(float wavelength, int material)
 {
-    DataUsage usage = materialsDataUsage(material);
-    return inputs.scalars[usage.scalars] * colorIntensity(wavelength, inputs.vectors[usage.vectors].xyz);
+    uint vectorId = inputs.materials[material].y;
+    uint scalarId = inputs.materials[material].z;
+
+    return inputs.scalars[scalarId] * colorIntensity(wavelength, inputs.vectors[vectorId].xyz);
 }

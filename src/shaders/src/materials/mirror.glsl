@@ -1,8 +1,10 @@
 #pragma once
-#include "../materials/material.glsl"
+
 #include "../types/collision.glsl"
 #include "../types/ray.glsl"
+#include "../types/reflection.glsl"
 #include "../utils/random.glsl"
+#include "../utils/vector_ops.glsl"
 
 ReflectionOpt Mirror_reflect(Ray ray, CollisionOpt collision)
 {
@@ -11,8 +13,8 @@ ReflectionOpt Mirror_reflect(Ray ray, CollisionOpt collision)
     {
         return InvalidReflection;
     }
-    DataUsage usage = materialsDataUsage(collision.material);
+    uint vectorId = inputs.materials[collision.material].y;
     return ReflectionOpt(true,
                          Ray(collision.point, reflected, ray.wavelength),
-                         colorIntensity(ray.wavelength, inputs.vectors[usage.vectors].xyz));
+                         colorIntensity(ray.wavelength, inputs.vectors[vectorId].xyz));
 }

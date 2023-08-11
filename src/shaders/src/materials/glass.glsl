@@ -1,7 +1,8 @@
 #pragma once
-#include "../materials/material.glsl"
+
 #include "../types/collision.glsl"
 #include "../types/ray.glsl"
+#include "../types/reflection.glsl"
 #include "../utils/random.glsl"
 #include "../utils/vector_ops.glsl"
 
@@ -39,8 +40,9 @@ float refractionIncoming(float refractiveIndex, float wavelength)
 
 ReflectionOpt Glass_reflect(Ray ray, CollisionOpt collision)
 {
-    DataUsage usage = materialsDataUsage(collision.material);
-    float refractiveIndex = inputs.scalars[usage.scalars];
+    uint scalarId = inputs.materials[collision.material].z;
+
+    float refractiveIndex = inputs.scalars[scalarId];
 
     float ratio = collision.fromInside
                 ? refractionOutgoing(refractiveIndex, ray.wavelength)

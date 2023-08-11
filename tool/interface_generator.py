@@ -35,6 +35,7 @@ type_map = {
         "int": "i32",
         "float": "float",
         "vec4": "float",
+        "uvec4": "u32",
         "size_t": "usize"
     },
     "glsl": {
@@ -42,6 +43,7 @@ type_map = {
         "int": "int",
         "float": "float",
         "vec4": "vec4",
+        "uvec4": "uvec4",
         "size_t": "uint"
     }
 }
@@ -50,7 +52,8 @@ alignment = {
     "uint": 4,
     "int": 4,
     "float": 4,
-    "vec4": 16
+    "vec4": 16,
+    "uvec4": 16
 }
 
 
@@ -71,7 +74,7 @@ def gen_buffer(entry):
         count = 1
         if "size" in field:
             count = field["size"]
-        if mode == "cpp" and field["type"] == "vec4":
+        if mode == "cpp" and (field["type"] == "vec4" or field["type"] == "uvec4"):
             if type(count) == int:
                 count *= 4
             else:

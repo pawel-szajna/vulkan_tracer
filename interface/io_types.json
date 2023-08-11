@@ -26,10 +26,10 @@
                 { "type": "uint", "name": "renderHeight" },
 
                 { "type": "uint", "name": "shapesCount" },
-                { "type": "uint", "name": "shapes", "size": "shapesLimit" },
+                { "type": "uvec4", "name": "shapes", "size": "shapesLimit" },
 
                 { "type": "uint", "name": "materialsCount" },
-                { "type": "uint", "name": "materials", "size": "materialsLimit" },
+                { "type": "uvec4", "name": "materials", "size": "materialsLimit" },
 
                 { "type": "vec4", "name": "vectors", "size": "vectorsLimit" },
                 { "type": "float", "name": "scalars", "size": "scalarsLimit" },
