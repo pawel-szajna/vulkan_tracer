@@ -146,6 +146,5 @@ void Approximation::processSector()
 
     std::lock_guard lock{mutex};
     remaining -= 1;
-    SPDLOG_DEBUG("Approximation task finished, {} remain", remaining);
 }
 }

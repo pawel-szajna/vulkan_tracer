@@ -1,6 +1,8 @@
 add_executable(
     vulkan_tracer
-        src/main.cpp
+        src/Arguments.cpp
+        src/Front.cpp
+        src/Main.cpp
 )
 
 add_dependencies(
