@@ -4,6 +4,16 @@ vulkan tracer
 A raytracer running on the GPU, utilizing the Vulkan framework to execute the
 raytracing algorithm on compute shaders.
 
+Currently implemented features
+------------------------------
+
+* Basic shapes (sphere, prism, volumetric cloud)
+* Basic materials (diffuse surface, mirror/specular surface, light-emitting surface, glass/refracting surface, fog)
+* Physically based GPU Monte Carlo path tracer with global illumination and ray refractions based on wavelength
+* Live preview of the rendered scene
+* CPU filtering framework (with very simple filters implemented)
+* A custom format and interface for delivering objects data to the GPU
+
 Dependencies
 ------------
 
